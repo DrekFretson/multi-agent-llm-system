@@ -1,6 +1,9 @@
 # Python
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Virtual environment
 .venv/
@@ -10,12 +13,18 @@ __pycache__/
 
 # Jupyter
 .ipynb_checkpoints/
+*.ipynb.tmp
 
 # IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
 
 # Logs
 *.log
 logs/
 
-# Experiment outputs
+# Local experiment outputs
+experiments/results/
