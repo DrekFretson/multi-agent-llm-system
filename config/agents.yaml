@@ -1,0 +1,30 @@
+agents:
+  orchestrator:
+    model: reasoning
+    generation:
+      temperature: 0.05
+      max_tokens: 4000
+
+  research:
+    model: reasoning
+    generation:
+      temperature: 0.1
+      max_tokens: 3000
+
+  coding:
+    model: coding
+    generation:
+      temperature: 0.05
+      max_tokens: 3000
+
+  math:
+    model: reasoning
+    generation:
+      temperature: 0.05
+      max_tokens: 4000
+
+  critic:
+    model: reasoning
+    generation:
+      temperature: 0.025
+      max_tokens: 3500

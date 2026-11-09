@@ -11,6 +11,15 @@ from .client import (
     NetworkError,
     RateLimitError,
 )
+from .model_registry import (
+    ModelConfig,
+    ModelConfigError,
+    ModelConfigFileNotFoundError,
+    ModelCost,
+    ModelNotFoundError,
+    ModelRegistry,
+    ModelRegistryError,
+)
 
 __all__ = [
     "AuthenticationError",
@@ -20,6 +29,13 @@ __all__ = [
     "LLMResponse",
     "LLMTimeoutError",
     "MissingAPIKeyError",
+    "ModelConfig",
+    "ModelConfigError",
+    "ModelConfigFileNotFoundError",
+    "ModelCost",
+    "ModelNotFoundError",
+    "ModelRegistry",
+    "ModelRegistryError",
     "NetworkError",
     "RateLimitError",
 ]

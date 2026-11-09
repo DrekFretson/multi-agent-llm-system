@@ -1,2 +1,7 @@
 openai==3.46.0
 python-dotenv==1.2.4
+PyYAML==6.0.3
+tavily-python==0.8.5
+sympy==1.14.0
+numpy==2.5.4
+scipy==1.18.1

@@ -1,0 +1,30 @@
+models:
+  # Catalog metadata checked 2026-11-09:
+  # https://openrouter.ai/nvidia/nemotron-3-ultra-550b-a55b:free
+  reasoning:
+    provider: openrouter
+    model_id: "nvidia/nemotron-3-ultra-550b-a55b:free"
+    cost:
+      input_per_1m_tokens: 0.0
+      output_per_1m_tokens: 0.0
+    context_window: 1000000
+    capabilities:
+      - text_generation
+      - code_generation
+      - reasoning
+      - math
+      - tool_calling
+
+  # https://openrouter.ai/cohere/north-mini-code:free
+  coding:
+    provider: openrouter
+    model_id: "cohere/north-mini-code:free"
+    cost:
+      input_per_1m_tokens: 0.0
+      output_per_1m_tokens: 0.0
+    context_window: 256000
+    capabilities:
+      - text_generation
+      - code_generation
+      - reasoning
+      - tool_calling
