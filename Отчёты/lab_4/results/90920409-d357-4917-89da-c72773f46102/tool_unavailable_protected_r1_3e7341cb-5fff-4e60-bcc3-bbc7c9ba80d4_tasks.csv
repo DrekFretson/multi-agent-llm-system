@@ -1,0 +1,4 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:40:10.956Z,3e7341cb-5fff-4e60-bcc3-bbc7c9ba80d4,90920409-d357-4917-89da-c72773f46102,research-search,research,COMPLETED_WITH_FALLBACK,0.0,
+2026-11-12T15:40:10.956Z,3e7341cb-5fff-4e60-bcc3-bbc7c9ba80d4,90920409-d357-4917-89da-c72773f46102,independent-coding,coding,COMPLETED,0.0,
+2026-11-12T15:40:10.956Z,3e7341cb-5fff-4e60-bcc3-bbc7c9ba80d4,90920409-d357-4917-89da-c72773f46102,legitimate-tool_unavailable,coding,COMPLETED,0.0,

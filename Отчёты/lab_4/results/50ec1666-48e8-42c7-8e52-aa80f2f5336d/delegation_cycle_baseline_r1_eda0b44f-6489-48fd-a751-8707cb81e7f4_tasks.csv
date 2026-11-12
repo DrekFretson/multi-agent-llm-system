@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:36:43.738Z,eda0b44f-6489-48fd-a751-8707cb81e7f4,50ec1666-48e8-42c7-8e52-aa80f2f5336d,legitimate-delegation_cycle,coding,COMPLETED,0.0,

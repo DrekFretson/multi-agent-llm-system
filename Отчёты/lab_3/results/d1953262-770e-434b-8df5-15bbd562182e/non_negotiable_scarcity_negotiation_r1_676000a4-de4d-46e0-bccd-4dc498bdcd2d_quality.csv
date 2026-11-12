@@ -1,0 +1,2 @@
+run_id,experiment_id,execution_status,conflicts,resolved_conflicts,unresolved_conflicts,priority_violations,jain_fairness_index
+676000a4-de4d-46e0-bccd-4dc498bdcd2d,d1953262-770e-434b-8df5-15bbd562182e,PARTIAL,1,0,1,3,0.6

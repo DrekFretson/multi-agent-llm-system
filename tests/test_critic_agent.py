@@ -83,6 +83,46 @@ def test_valid_coding_result_can_be_approved(agent: CriticAgent, client: Mock) -
     assert report.checks[0]["status"] == "passed"
 
 
+def test_critic_can_return_needs_input_with_a_specific_question(agent: CriticAgent, client: Mock) -> None:
+    data = json.loads(payload(verdict="NEEDS_INPUT"))
+    data["clarification_question"] = "Какую версию Python нужно поддерживать?"
+    client.generate.return_value = response(json.dumps(data))
+
+    report = agent.review(
+        "Реализуй библиотеку", "Нужны дополнительные требования.", result_type="general"
+    )
+
+    assert report.verdict == "NEEDS_INPUT"
+    assert report.clarification_question == "Какую версию Python нужно поддерживать?"
+
+
+def test_missing_review_evidence_remains_needs_input_instead_of_starting_rejection_cycle(
+    agent: CriticAgent,
+    client: Mock,
+) -> None:
+    data = json.loads(payload(verdict="NEEDS_INPUT", score=0))
+    data["issues"] = [{
+        "category": "EVIDENCE",
+        "severity": "CRITICAL",
+        "description": "The actual source files were not included in the review material.",
+        "location": None,
+        "recommendation": "Provide the source files so they can be reviewed.",
+        "target_task_id": "coding-task",
+    }]
+    data["clarification_question"] = "Please provide the generated source files."
+    client.generate.return_value = response(json.dumps(data))
+
+    report = agent.review(
+        "Implement a CSV analyzer.",
+        {"summary": "Created a CSV analyzer project."},
+        result_type="multi_agent_execution",
+        agent_name="orchestrator",
+    )
+
+    assert report.verdict == "NEEDS_INPUT"
+    assert report.clarification_question == "Please provide the generated source files."
+
+
 def test_critical_binary_search_bug_overrides_high_score_approval(agent: CriticAgent, client: Mock) -> None:
     client.generate.return_value = response(payload(verdict="APPROVED", score=99))
     report = agent.review(
@@ -160,6 +200,46 @@ def test_malformed_json_and_llm_errors_are_distinguished(agent: CriticAgent, cli
     client.generate.side_effect = LLMAPIError("provider failed")
     with pytest.raises(CriticLLMError):
         agent.review("Task", "Answer")
+
+
+def test_critic_format_repair_succeeds_once_and_is_visible(agent: CriticAgent, client: Mock) -> None:
+    client.generate.side_effect = [response("not json"), response(payload())]
+
+    report = agent.review("Task", "Answer", max_format_retries=1)
+
+    assert report.verdict == "APPROVED"
+    assert report.format_repair_attempts == 1
+    assert client.generate.call_count == 2
+    assert "Ошибка проверки" in client.generate.call_args.kwargs["messages"][1]["content"]
+
+
+@pytest.mark.parametrize("invalid_field", ["category", "severity"])
+def test_critic_repairs_unsupported_issue_values(agent: CriticAgent, client: Mock, invalid_field: str) -> None:
+    unsupported = {
+        "category": "CORRECTNESS", "severity": "BLOCKER", "description": "Issue",
+        "location": None, "recommendation": "Recheck it.",
+    }
+    unsupported[invalid_field] = "UNSUPPORTED"
+    client.generate.side_effect = [
+        response(payload(issues=[unsupported])),
+        response(payload()),
+    ]
+
+    report = agent.review("Task", "Answer", max_format_retries=1)
+
+    assert report.format_repair_attempts == 1
+    assert report.verdict == "APPROVED"
+    assert client.generate.call_count == 2
+
+
+def test_critic_repair_failure_does_not_loop(agent: CriticAgent, client: Mock) -> None:
+    client.generate.side_effect = [response("not json"), response("still not json")]
+
+    with pytest.raises(CriticReportParseError) as error:
+        agent.review("Task", "Answer", max_format_retries=1)
+
+    assert error.value.repair_attempts == 1
+    assert client.generate.call_count == 2
 
 
 def test_unknown_result_type_discloses_limits_and_still_uses_general_review(agent: CriticAgent, client: Mock) -> None:

@@ -1,0 +1,15 @@
+experiment: lab_4_reliability_security
+version: 1
+seed: 40504
+repeats: 3
+dataset: ../datasets/lab_4_scenarios.json
+payload_limit_bytes: 4096
+max_delegation_depth: 5
+max_delegation_handoffs: 5
+instruction_precedence:
+  - system
+  - security_policy
+  - task_owner
+  - delegated_context
+  - agent_output
+  - untrusted_data

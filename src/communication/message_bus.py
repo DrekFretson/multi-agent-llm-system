@@ -30,6 +30,10 @@ class MessageDeliveryError(MessageBusError):
     """Raised when a technical error prevents adding a message to an inbox."""
 
 
+class MessageAuthorizationError(MessageBusError):
+    """Raised when an optional authorization policy blocks message delivery."""
+
+
 class _EventLogger(Protocol):
     def log_event(self, event_type: str, **fields: object) -> object: ...
 
@@ -45,11 +49,14 @@ class MessageBus:
     without one, delivery remains available and no event file is written.
     """
 
-    def __init__(self, logger: _EventLogger | None = None) -> None:
-        """Create an empty bus and optionally share an existing event logger."""
+    def __init__(self, logger: _EventLogger | None = None, *, authorizer: object | None = None) -> None:
+        """Create a bus with optional event logging and a message policy hook."""
         if logger is not None and not callable(getattr(logger, "log_event", None)):
             raise TypeError("logger must provide a callable log_event() method or be None.")
         self._logger = logger
+        if authorizer is not None and not callable(authorizer):
+            raise TypeError("authorizer must be callable or None.")
+        self._authorizer = authorizer
         self._inboxes: dict[str, deque[Message]] = {}
         self._lock = threading.RLock()
         self._last_logging_error: Exception | None = None
@@ -94,6 +101,16 @@ class MessageBus:
             raise MessageBusError("message must be a Message instance.")
         # Message is mutable, so revalidate before it enters the queue.
         message.__post_init__()
+
+        if self._authorizer is not None:
+            try:
+                self._authorizer(message)
+            except Exception as cause:
+                blocked = MessageAuthorizationError(
+                    f"Message {message.message_id!r} was blocked by authorization policy."
+                )
+                self._log_delivery(message, "blocked", blocked, cause)
+                raise blocked from cause
 
         failure: MessageBusError | None = None
         delivery_cause: Exception | None = None
@@ -147,6 +164,19 @@ class MessageBus:
         error: MessageBusError | None,
         cause: Exception | None = None,
     ) -> None:
+        try:
+            from src.evaluation.metrics import record_current_message
+
+            record_current_message(
+                task_id=message.task_id, message_id=message.message_id,
+                sender=message.sender, receiver=message.receiver,
+                message_type=message.message_type.value, delivery_status=delivery_status,
+                error_type=type(error).__name__ if error is not None else None,
+                error_message=str(error) if error is not None else None,
+            )
+        except Exception:
+            # Metrics are observational and cannot affect message delivery.
+            pass
         if self._logger is None:
             return
         fields: dict[str, object] = {
@@ -163,6 +193,16 @@ class MessageBus:
             "cause_message": str(cause) if cause is not None else None,
         }
         try:
+            from src.evaluation.metrics import current_metric_context
+
+            context = current_metric_context()
+            if context is not None:
+                fields.update({"run_id": context.run_id,
+                               "experiment_id": context.experiment_id,
+                               "agent_role": context.agent_role})
+        except Exception:
+            pass
+        try:
             self._logger.log_event("message_delivery", **fields)
         except Exception as logging_error:
             self._last_logging_error = logging_error
@@ -172,6 +212,7 @@ class MessageBus:
 
 __all__ = [
     "AgentRegistrationError",
+    "MessageAuthorizationError",
     "MessageBus",
     "MessageBusError",
     "MessageDeliveryError",

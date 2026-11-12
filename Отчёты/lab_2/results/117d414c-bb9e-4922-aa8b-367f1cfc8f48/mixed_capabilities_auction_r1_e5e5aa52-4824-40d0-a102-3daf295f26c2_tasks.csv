@@ -1,0 +1,7 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:36:21.041Z,e5e5aa52-4824-40d0-a102-3daf295f26c2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_research_1,research_fast,COMPLETED,0.0,
+2026-11-12T15:36:21.041Z,e5e5aa52-4824-40d0-a102-3daf295f26c2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_code_1,coder_general,COMPLETED,0.0,
+2026-11-12T15:36:21.041Z,e5e5aa52-4824-40d0-a102-3daf295f26c2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_test_1,coder_general,COMPLETED,0.0,
+2026-11-12T15:36:21.041Z,e5e5aa52-4824-40d0-a102-3daf295f26c2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_review_1,critic,COMPLETED,0.0,
+2026-11-12T15:36:21.041Z,e5e5aa52-4824-40d0-a102-3daf295f26c2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_research_2,research_economy,COMPLETED,0.0,
+2026-11-12T15:36:21.041Z,e5e5aa52-4824-40d0-a102-3daf295f26c2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_unavailable,,SKIPPED,0.0,Auction received no eligible bids.

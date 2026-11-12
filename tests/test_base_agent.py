@@ -74,6 +74,8 @@ def test_run_returns_agent_result_on_success(
         error=None,
         prompt_tokens=12,
         completion_tokens=8,
+        total_tokens=20,
+        finish_reason="stop",
     )
 
 
@@ -175,6 +177,7 @@ def test_llm_client_error_becomes_failed_result(
         error="LLMAPIError: OpenRouter API error (HTTP 503): provider unavailable",
         prompt_tokens=None,
         completion_tokens=None,
+        error_type="LLMAPIError",
     )
 
 
@@ -201,6 +204,9 @@ def test_empty_model_response_becomes_failed_result(
     assert result.model == agent_config.model_id
     assert result.prompt_tokens == 5
     assert result.completion_tokens == 0
+    assert result.total_tokens == 5
+    assert result.finish_reason == "stop"
+    assert result.error_type == "EmptyModelResponseError"
 
 
 def test_unexpected_programming_errors_are_not_swallowed(

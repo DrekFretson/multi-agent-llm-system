@@ -127,6 +127,36 @@ def test_duplicate_task_id_is_rejected() -> None:
         store.create_task(make_task("task-a", description="another"))
 
 
+def test_create_tasks_atomically_stores_related_batch() -> None:
+    store = TaskStore()
+    created = store.create_tasks([
+        make_task("root"),
+        make_task("first", parent_task_id="root"),
+        make_task("second", parent_task_id="root", dependencies=["first"]),
+    ])
+
+    assert [task.task_id for task in created] == ["root", "first", "second"]
+    assert store.get_task("second").dependencies == ["first"]
+    assert [task.task_id for task in store.get_subtasks("root")] == ["first", "second"]
+
+
+def test_create_tasks_does_not_partially_store_invalid_batch() -> None:
+    store = TaskStore()
+    with pytest.raises(DependencyError, match="was not found"):
+        store.create_tasks([
+            make_task("root"),
+            make_task("child", parent_task_id="root", dependencies=["missing"]),
+        ])
+    assert store.get_all_tasks() == []
+
+
+def test_create_tasks_rejects_duplicate_ids_without_partial_storage() -> None:
+    store = TaskStore()
+    with pytest.raises(TaskAlreadyExistsError, match="duplicate task IDs"):
+        store.create_tasks([make_task("same"), make_task("same")])
+    assert store.get_all_tasks() == []
+
+
 def test_get_missing_task_raises_not_found() -> None:
     with pytest.raises(TaskNotFoundError, match="not found"):
         TaskStore().get_task("missing")
@@ -236,6 +266,9 @@ def test_update_rejects_parent_cycle_without_mutation() -> None:
         (TaskStatus.REVIEW, TaskStatus.COMPLETED),
         (TaskStatus.REVIEW, TaskStatus.FAILED),
         (TaskStatus.REVIEW, TaskStatus.CANCELLED),
+        (TaskStatus.NEEDS_INPUT, TaskStatus.READY),
+        (TaskStatus.NEEDS_INPUT, TaskStatus.FAILED),
+        (TaskStatus.NEEDS_INPUT, TaskStatus.CANCELLED),
         (TaskStatus.FAILED, TaskStatus.READY),
         (TaskStatus.FAILED, TaskStatus.ASSIGNED),
         (TaskStatus.FAILED, TaskStatus.CANCELLED),
@@ -256,6 +289,7 @@ def test_allowed_status_transitions(current: TaskStatus, target: TaskStatus) -> 
         (TaskStatus.CANCELLED, TaskStatus.RUNNING),
         (TaskStatus.FAILED, TaskStatus.COMPLETED),
         (TaskStatus.REVIEW, TaskStatus.ASSIGNED),
+        (TaskStatus.NEEDS_INPUT, TaskStatus.COMPLETED),
     ],
 )
 def test_disallowed_status_transitions_do_not_mutate_task(current, target) -> None:

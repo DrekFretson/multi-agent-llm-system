@@ -23,6 +23,13 @@ class AgentResult:
     error: str | None
     prompt_tokens: int | None
     completion_tokens: int | None
+    total_tokens: int | None = None
+    finish_reason: str | None = None
+    error_type: str | None = None
+    task_completed: bool | None = None
+    needs_input: bool = False
+    clarification_question: str | None = None
+    format_repair_attempts: int = 0
 
 
 class BaseAgent:
@@ -91,6 +98,9 @@ class BaseAgent:
                 error=f"{type(error).__name__}: {error}",
                 prompt_tokens=None,
                 completion_tokens=None,
+                total_tokens=None,
+                finish_reason=None,
+                error_type=type(error).__name__,
             )
 
         response_model = response.model or model_id
@@ -104,6 +114,9 @@ class BaseAgent:
                 error="The model returned an empty response.",
                 prompt_tokens=response.prompt_tokens,
                 completion_tokens=response.completion_tokens,
+                total_tokens=response.total_tokens,
+                finish_reason=response.finish_reason,
+                error_type="EmptyModelResponseError",
             )
 
         return AgentResult(
@@ -114,4 +127,7 @@ class BaseAgent:
             error=None,
             prompt_tokens=response.prompt_tokens,
             completion_tokens=response.completion_tokens,
+            total_tokens=response.total_tokens,
+            finish_reason=response.finish_reason,
+            error_type=None,
         )

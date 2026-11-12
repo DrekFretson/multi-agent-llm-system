@@ -84,7 +84,7 @@ def tool_result(
 
 def test_math_agent_uses_math_role_and_specialized_prompts(agent: MathAgent) -> None:
     assert agent.config.name == "math"
-    assert agent.config.logical_model_id == "reasoning"
+    assert agent.config.logical_model_id == "math"
     assert agent.name == "Math Agent"
     assert "Python-инструмента" in agent.system_prompt
 

@@ -44,18 +44,47 @@ def write_agent_config(tmp_path: Path, content: str) -> Path:
 def test_default_configuration_resolves_complete_agent_settings() -> None:
     agents = AgentConfigRegistry()
 
+    orchestrator = agents.get_agent("orchestrator")
+    assert orchestrator.model_id == "nvidia/nemotron-3-ultra-550b-a55b:free"
+    assert orchestrator.generation_params == {
+        "temperature": 0.05,
+        "max_tokens": 32768,
+        "reasoning": {"max_tokens": 8192},
+    }
     coding = agents.get_agent("coding")
 
     assert coding.logical_model_id == "coding"
     assert coding.model_id == "cohere/north-mini-code:free"
     assert coding.model_config.provider == "openrouter"
-    assert coding.generation_params == {"temperature": 0.05, "max_tokens": 3000}
+    assert coding.generation_params == {
+        "temperature": 0.05,
+        "max_tokens": 32000,
+        "reasoning": {"max_tokens": 8000},
+    }
     research = agents.get_agent("research")
     assert research.logical_model_id == "reasoning"
-    assert research.generation_params == {"temperature": 0.1, "max_tokens": 3000}
+    assert research.model_id == "nvidia/nemotron-3-ultra-550b-a55b:free"
+    assert research.generation_params == {
+        "temperature": 0.1,
+        "max_tokens": 32768,
+        "reasoning": {"max_tokens": 8192},
+    }
     math_agent = agents.get_agent("math")
-    assert math_agent.logical_model_id == "reasoning"
-    assert math_agent.generation_params == {"temperature": 0.05, "max_tokens": 4000}
+    assert math_agent.logical_model_id == "math"
+    assert math_agent.model_id == "google/gemma-4-31b-it:free"
+    assert math_agent.model_config.context_window == 262144
+    assert math_agent.generation_params == {
+        "temperature": 0.05,
+        "max_tokens": 16384,
+        "reasoning": {"max_tokens": 4096},
+    }
+    critic = agents.get_agent("critic")
+    assert critic.model_id == "nvidia/nemotron-3-ultra-550b-a55b:free"
+    assert critic.generation_params == {
+        "temperature": 0.025,
+        "max_tokens": 32768,
+        "reasoning": {"max_tokens": 8192},
+    }
     assert agents.has_agent("research") is True
     assert agents.has_agent("not-configured") is False
 
@@ -107,6 +136,43 @@ agents:
     )
 
     with pytest.raises(AgentConfigError, match="max_tokens.*positive integer"):
+        AgentConfigRegistry(config_path, write_model_config(tmp_path))
+
+
+def test_reasoning_budget_is_supported_and_validated(tmp_path: Path) -> None:
+    config_path = write_agent_config(
+        tmp_path,
+        """\
+agents:
+  coding:
+    model: reasoning
+    generation:
+      temperature: 0.2
+      max_tokens: 12000
+      reasoning: {max_tokens: 2048}
+""",
+    )
+
+    config = AgentConfigRegistry(config_path, write_model_config(tmp_path)).get_agent("coding")
+
+    assert config.generation_params["reasoning"] == {"max_tokens": 2048}
+
+
+def test_reasoning_effort_and_token_cap_cannot_both_be_set(tmp_path: Path) -> None:
+    config_path = write_agent_config(
+        tmp_path,
+        """\
+agents:
+  coding:
+    model: reasoning
+    generation:
+      temperature: 0.2
+      max_tokens: 12000
+      reasoning: {effort: low, max_tokens: 2048}
+""",
+    )
+
+    with pytest.raises(AgentConfigError, match="either 'reasoning.effort'.*not both"):
         AgentConfigRegistry(config_path, write_model_config(tmp_path))
 
 

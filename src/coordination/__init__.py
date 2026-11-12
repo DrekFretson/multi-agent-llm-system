@@ -27,8 +27,23 @@ from .task_store import (
     TaskType,
     TaskValidationError,
 )
+from .task_executor import (
+    AgentRequestFailed,
+    AgentOutcomeParseError,
+    CriticRejectedError,
+    EmptyModelResponseError,
+    ExecutionBudgetExceeded,
+    ExecutionEvent,
+    IncompleteTaskResultError,
+    TaskExecutionError,
+    TaskExecutionReport,
+    TaskExecutor,
+)
+from .experiments import compare_critic_modes
 
 __all__ = [
+    "AgentRequestFailed",
+    "AgentOutcomeParseError",
     "DEFAULT_DELEGATION_RULES",
     "DelegationCycleError",
     "DelegationDeliveryError",
@@ -52,4 +67,13 @@ __all__ = [
     "TaskStoreError",
     "TaskType",
     "TaskValidationError",
+    "CriticRejectedError",
+    "EmptyModelResponseError",
+    "ExecutionBudgetExceeded",
+    "ExecutionEvent",
+    "IncompleteTaskResultError",
+    "TaskExecutionError",
+    "TaskExecutionReport",
+    "TaskExecutor",
+    "compare_critic_modes",
 ]

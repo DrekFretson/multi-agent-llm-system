@@ -1,0 +1,79 @@
+{
+  "timestamp": "2026-11-12T15:40:10.936Z",
+  "finished_at": "2026-11-12T15:40:10.936Z",
+  "run_id": "a9e12f52-9938-4084-a055-c06e404c01d7",
+  "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+  "duration_ms": 0.145,
+  "api_calls": 0,
+  "llm_api_calls": 0,
+  "external_api_calls": 0,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "estimated_cost": null,
+  "known_prompt_tokens_subtotal": null,
+  "known_completion_tokens_subtotal": null,
+  "known_cost_subtotal": null,
+  "unknown_cost_calls": 0,
+  "incomplete_cost_calls": 0,
+  "missing_usage_calls": 0,
+  "error_count": 0,
+  "message_count": 2,
+  "incident_count": 0,
+  "task_count": 1,
+  "agent_invocations": 0,
+  "retry_count": 0,
+  "critic_calls": 0,
+  "critic_cycles": null,
+  "quality": {
+    "detected": false,
+    "blocked": false,
+    "false_blocks": 0,
+    "execution_status": "COMPLETED"
+  },
+  "llm_calls": [],
+  "external_calls": [],
+  "security_incidents": [],
+  "tasks": [
+    {
+      "timestamp": "2026-11-12T15:40:10.936Z",
+      "run_id": "a9e12f52-9938-4084-a055-c06e404c01d7",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "legitimate-malformed_message",
+      "agent_role": "coding",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    }
+  ],
+  "agents": [],
+  "messages": [
+    {
+      "timestamp": "2026-11-12T15:40:10.936Z",
+      "run_id": "a9e12f52-9938-4084-a055-c06e404c01d7",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "bad-contract",
+      "message_id": "0eb8bb80-4be0-4c68-a173-6b072e2ebbae",
+      "sender": "coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "timestamp": "2026-11-12T15:40:10.936Z",
+      "run_id": "a9e12f52-9938-4084-a055-c06e404c01d7",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "legitimate-malformed_message",
+      "message_id": "55da6bd7-ce30-415b-8bb3-4f383007edde",
+      "sender": "coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "errors": []
+}

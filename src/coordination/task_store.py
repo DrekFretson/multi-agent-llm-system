@@ -7,7 +7,7 @@ import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any
+from typing import Any, Iterable
 
 
 class TaskType(str, Enum):
@@ -37,8 +37,10 @@ class TaskStatus(str, Enum):
     RUNNING = "RUNNING"
     WAITING = "WAITING"
     REVIEW = "REVIEW"
+    NEEDS_INPUT = "NEEDS_INPUT"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
+    SKIPPED = "SKIPPED"
     CANCELLED = "CANCELLED"
 
 
@@ -97,6 +99,7 @@ class Task:
     error: str | None = None
     created_at: datetime = field(default_factory=_utc_now)
     updated_at: datetime = field(default_factory=_utc_now)
+    delegation_depth: int = 0
     _identity_locked: bool = field(default=False, init=False, repr=False, compare=False)
 
     def __setattr__(self, name: str, value: Any) -> None:
@@ -139,6 +142,8 @@ class Task:
         deadline = _as_utc_datetime(self.deadline, "deadline", optional=True)
         created_at = _as_utc_datetime(self.created_at, "created_at")
         updated_at = _as_utc_datetime(self.updated_at, "updated_at")
+        if isinstance(self.delegation_depth, bool) or not isinstance(self.delegation_depth, int) or self.delegation_depth < 0:
+            raise TaskValidationError("delegation_depth must be a non-negative integer.")
         object.__setattr__(self, "deadline", deadline)
         object.__setattr__(self, "created_at", created_at)
         object.__setattr__(self, "updated_at", updated_at)
@@ -151,14 +156,16 @@ class TaskStore:
     # State changes are explicit. Failed work can be readied and assigned again;
     # terminal tasks cannot silently return to active execution.
     ALLOWED_STATUS_TRANSITIONS: dict[TaskStatus, frozenset[TaskStatus]] = {
-        TaskStatus.NEW: frozenset({TaskStatus.READY, TaskStatus.ASSIGNED, TaskStatus.FAILED, TaskStatus.CANCELLED}),
-        TaskStatus.READY: frozenset({TaskStatus.ASSIGNED, TaskStatus.FAILED, TaskStatus.CANCELLED}),
-        TaskStatus.ASSIGNED: frozenset({TaskStatus.READY, TaskStatus.RUNNING, TaskStatus.WAITING, TaskStatus.FAILED, TaskStatus.CANCELLED}),
-        TaskStatus.RUNNING: frozenset({TaskStatus.WAITING, TaskStatus.REVIEW, TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED}),
-        TaskStatus.WAITING: frozenset({TaskStatus.READY, TaskStatus.ASSIGNED, TaskStatus.RUNNING, TaskStatus.FAILED, TaskStatus.CANCELLED}),
-        TaskStatus.REVIEW: frozenset({TaskStatus.READY, TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.CANCELLED}),
+        TaskStatus.NEW: frozenset({TaskStatus.READY, TaskStatus.ASSIGNED, TaskStatus.FAILED, TaskStatus.SKIPPED, TaskStatus.CANCELLED}),
+        TaskStatus.READY: frozenset({TaskStatus.ASSIGNED, TaskStatus.FAILED, TaskStatus.SKIPPED, TaskStatus.CANCELLED}),
+        TaskStatus.ASSIGNED: frozenset({TaskStatus.READY, TaskStatus.RUNNING, TaskStatus.WAITING, TaskStatus.FAILED, TaskStatus.SKIPPED, TaskStatus.CANCELLED}),
+        TaskStatus.RUNNING: frozenset({TaskStatus.WAITING, TaskStatus.REVIEW, TaskStatus.NEEDS_INPUT, TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.SKIPPED, TaskStatus.CANCELLED}),
+        TaskStatus.WAITING: frozenset({TaskStatus.READY, TaskStatus.ASSIGNED, TaskStatus.RUNNING, TaskStatus.FAILED, TaskStatus.SKIPPED, TaskStatus.CANCELLED}),
+        TaskStatus.REVIEW: frozenset({TaskStatus.READY, TaskStatus.COMPLETED, TaskStatus.FAILED, TaskStatus.SKIPPED, TaskStatus.CANCELLED}),
+        TaskStatus.NEEDS_INPUT: frozenset({TaskStatus.READY, TaskStatus.FAILED, TaskStatus.CANCELLED}),
         TaskStatus.COMPLETED: frozenset(),
-        TaskStatus.FAILED: frozenset({TaskStatus.READY, TaskStatus.ASSIGNED, TaskStatus.CANCELLED}),
+        TaskStatus.FAILED: frozenset({TaskStatus.READY, TaskStatus.ASSIGNED, TaskStatus.SKIPPED, TaskStatus.CANCELLED}),
+        TaskStatus.SKIPPED: frozenset(),
         TaskStatus.CANCELLED: frozenset(),
     }
 
@@ -183,6 +190,38 @@ class TaskStore:
             self._validate_relationships(candidate)
             self._tasks[candidate.task_id] = candidate
             return self._copy_task(candidate)
+
+    def create_tasks(self, tasks: Iterable[Task]) -> list[Task]:
+        """Atomically create a related batch after validating its full graph.
+
+        Parent and dependency references may point to another task in the same
+        batch. No task is committed unless every task and relationship passes
+        validation.
+        """
+        try:
+            candidates = [self._copy_task(task) for task in tasks]
+        except TypeError as error:
+            raise TaskValidationError("tasks must be an iterable of Task records.") from error
+        if not candidates:
+            raise TaskValidationError("At least one task is required for batch creation.")
+        identifiers = [task.task_id for task in candidates]
+        if len(set(identifiers)) != len(identifiers):
+            raise TaskAlreadyExistsError("A task batch cannot contain duplicate task IDs.")
+
+        with self._lock:
+            existing = set(self._tasks)
+            conflicts = existing.intersection(identifiers)
+            if conflicts:
+                raise TaskAlreadyExistsError(
+                    "Task ID(s) already exist: " + ", ".join(sorted(conflicts)) + "."
+                )
+            staged = {**self._tasks, **{task.task_id: task for task in candidates}}
+            for candidate in candidates:
+                self._validate_relationships(candidate, tasks=staged)
+
+            detached = [self._copy_task(candidate) for candidate in candidates]
+            self._tasks.update({task.task_id: task for task in candidates})
+            return detached
 
     def get_task(self, task_id: str) -> Task:
         """Return a detached copy of one task."""
@@ -330,9 +369,15 @@ class TaskStore:
         with self._lock:
             return [self._copy_task(task) for task in self._tasks.values()]
 
-    def _validate_relationships(self, task: Task) -> None:
+    def _validate_relationships(
+        self,
+        task: Task,
+        *,
+        tasks: dict[str, Task] | None = None,
+    ) -> None:
+        task_records = self._tasks if tasks is None else tasks
         if task.parent_task_id is not None:
-            if task.parent_task_id not in self._tasks:
+            if task.parent_task_id not in task_records:
                 raise TaskNotFoundError(f"Parent task {task.parent_task_id!r} was not found.")
             parent_id = task.parent_task_id
             visited = {task.task_id}
@@ -340,18 +385,25 @@ class TaskStore:
                 if parent_id in visited:
                     raise TaskValidationError("Parent task relationships cannot contain a cycle.")
                 visited.add(parent_id)
-                parent = self._tasks.get(parent_id)
+                parent = task_records.get(parent_id)
                 if parent is None:
                     raise TaskNotFoundError(f"Parent task {parent_id!r} was not found.")
                 parent_id = parent.parent_task_id
 
         for dependency_id in task.dependencies:
-            if dependency_id not in self._tasks:
+            if dependency_id not in task_records:
                 raise DependencyError(f"Dependency task {dependency_id!r} was not found.")
-        if self._would_create_dependency_cycle(task.task_id, task.dependencies):
+        if self._would_create_dependency_cycle(task.task_id, task.dependencies, tasks=task_records):
             raise DependencyError("Task dependencies cannot contain a cycle.")
 
-    def _would_create_dependency_cycle(self, task_id: str, dependencies: list[str]) -> bool:
+    def _would_create_dependency_cycle(
+        self,
+        task_id: str,
+        dependencies: list[str],
+        *,
+        tasks: dict[str, Task] | None = None,
+    ) -> bool:
+        task_records = self._tasks if tasks is None else tasks
         pending = list(dependencies)
         visited: set[str] = set()
         while pending:
@@ -361,7 +413,7 @@ class TaskStore:
             if current_id in visited:
                 continue
             visited.add(current_id)
-            current = self._tasks.get(current_id)
+            current = task_records.get(current_id)
             if current is not None:
                 pending.extend(current.dependencies)
         return False

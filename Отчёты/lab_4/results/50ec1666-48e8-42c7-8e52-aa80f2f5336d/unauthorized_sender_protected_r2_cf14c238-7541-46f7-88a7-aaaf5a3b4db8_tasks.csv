@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:36:43.772Z,cf14c238-7541-46f7-88a7-aaaf5a3b4db8,50ec1666-48e8-42c7-8e52-aa80f2f5336d,legitimate-unauthorized_sender,coding,COMPLETED,0.0,

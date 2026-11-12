@@ -1,0 +1,4 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:40:10.840Z,49ad0d2c-c3ff-46f8-be14-53d4ca71ce4e,d1953262-770e-434b-8df5-15bbd562182e,task_research,research_agent,COMPLETED,0.0,
+2026-11-12T15:40:10.841Z,49ad0d2c-c3ff-46f8-be14-53d4ca71ce4e,d1953262-770e-434b-8df5-15bbd562182e,task_coding,,SKIPPED,0.0,Capacity exhausted; baseline does not negotiate.
+2026-11-12T15:40:10.841Z,49ad0d2c-c3ff-46f8-be14-53d4ca71ce4e,d1953262-770e-434b-8df5-15bbd562182e,task_review,,SKIPPED,0.0,Capacity exhausted; baseline does not negotiate.

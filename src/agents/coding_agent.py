@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 
 from src.agents.base_agent import AgentInputError, AgentResult, BaseAgent
@@ -16,6 +17,9 @@ JSON-объект без Markdown-ограждений, вступления и�
 
 Требования к решению:
 - Пиши корректный, читаемый код и соблюдай требования задания.
+- Подбирай объём ответа под задачу: для небольшого стандартного алгоритма дай
+  компактное объяснение, одну реализацию и только необходимые граничные тесты;
+  не добавляй альтернативные реализации и избыточные пояснения.
 - Если язык явно не задан, выбери язык, подходящий задаче, и укажи его в `language`.
 - Учитывай временную и пространственную сложность, объясняя важные решения в `summary`.
 - Обрабатывай граничные случаи и добавляй подходящие автоматические тесты.
@@ -27,6 +31,11 @@ JSON-объект без Markdown-ограждений, вступления и�
 - Дай конкретные инструкции по запуску кода и тестов в `run_instructions`.
 - Не утверждай и не подразумевай, что тесты запускались, если они фактически не запускались.
 - Если предоставлен существующий код, предложи целостную доработанную версию.
+- Если без конкретных требований пользователя нельзя выбрать корректное поведение,
+  верни `task_completed: false`, `needs_input: true` и один конкретный вопрос;
+  не подменяй решение демонстрационной заглушкой.
+- Для обычного завершённого решения верни `task_completed: true`,
+  `needs_input: false`, `clarification_question: null`.
 
 Формат ответа — ровно следующие поля JSON:
 {
@@ -35,7 +44,10 @@ JSON-объект без Markdown-ограждений, вступления и�
   "code": "полный исходный код",
   "tests": "исходный код тестов",
   "dependencies": ["имя зависимости"],
-  "run_instructions": "как запустить код и тесты"
+  "run_instructions": "как запустить код и тесты",
+  "task_completed": true,
+  "needs_input": false,
+  "clarification_question": null
 }
 
 JSON должен быть синтаксически корректным: экранируй кавычки и переносы строк
@@ -65,6 +77,9 @@ class CodingSolution:
     tests: str
     dependencies: list[str]
     run_instructions: str
+    task_completed: bool = True
+    needs_input: bool = False
+    clarification_question: str | None = None
 
 
 class CodingAgent(BaseAgent):
@@ -109,6 +124,7 @@ class CodingAgent(BaseAgent):
         additional_context: str | None = None,
         existing_code: str | None = None,
         test_requirements: str | None = None,
+        max_format_retries: int = 1,
     ) -> AgentResult:
         """Generate a solution, optionally including context and code to edit.
 
@@ -122,6 +138,8 @@ class CodingAgent(BaseAgent):
         ):
             if value is not None and not isinstance(value, str):
                 raise AgentInputError(f"{field_name} must be a string or None.")
+        if isinstance(max_format_retries, bool) or not isinstance(max_format_retries, int) or max_format_retries < 0:
+            raise AgentInputError("max_format_retries must be a non-negative integer.")
 
         request_parts = [f"Техническое задание:\n{task}"]
         if additional_context:
@@ -136,8 +154,63 @@ class CodingAgent(BaseAgent):
         if test_requirements:
             request_parts.append(f"Требования к тестам:\n{test_requirements}")
 
-        return super().run("\n\n".join(request_parts))
+        request = "\n\n".join(request_parts)
+        result = super().run(request)
+        if not result.success:
+            return result
 
+        try:
+            self.parse_solution(result)
+            if result.finish_reason != "length":
+                return result
+            raise CodingSolutionValidationError(
+                "Coding Agent response was truncated at the output token limit."
+            )
+        except CodingSolutionError as error:
+            # A length-limited completion can leave placeholder fragments in an
+            # otherwise useful answer. Give it the single bounded repair below.
+            truncated = result.finish_reason == "length"
+            if (
+                isinstance(error, CodingSolutionValidationError)
+                and "obvious placeholder" in str(error)
+                and not truncated
+            ):
+                return result
+            if max_format_retries == 0:
+                return result
+            initial_error = error
+
+        repair_prompt = (
+            "Исправь предыдущий ответ: он должен быть валидным JSON точной схемы, "
+            "указанной в системных инструкциях. Верни только JSON-объект; не добавляй "
+            "Markdown или пояснения. Экранируй все кавычки и переносы строк внутри "
+            "JSON-строк. Сохрани решение, код и тесты по смыслу. Не утверждай, что "
+            "тесты запускались.\n\n"
+            f"Причина отклонения: {initial_error}\n\n"
+            f"Предыдущий ответ:\n{result.content}"
+        )
+        repaired = super().run(request + "\n\n" + repair_prompt)
+        if not repaired.success:
+            initial_error.repair_attempts = 1
+            raise initial_error
+        try:
+            self.parse_solution(repaired)
+        except CodingSolutionError as repair_error:
+            repair_error.repair_attempts = 1
+            raise
+
+        return AgentResult(
+            agent_id=repaired.agent_id,
+            content=repaired.content,
+            model=repaired.model,
+            success=True,
+            error=None,
+            prompt_tokens=_sum_optional(result.prompt_tokens, repaired.prompt_tokens),
+            completion_tokens=_sum_optional(result.completion_tokens, repaired.completion_tokens),
+            total_tokens=_sum_optional(result.total_tokens, repaired.total_tokens),
+            finish_reason=repaired.finish_reason,
+            format_repair_attempts=1,
+        )
     def parse_solution(self, result: AgentResult) -> CodingSolution:
         """Parse and validate the JSON solution from an :class:`AgentResult`."""
         if not isinstance(result, AgentResult):
@@ -167,7 +240,8 @@ class CodingAgent(BaseAgent):
             "run_instructions",
         }
         missing = required_fields - payload.keys()
-        extra = payload.keys() - required_fields
+        status_fields = {"task_completed", "needs_input", "clarification_question"}
+        extra = payload.keys() - required_fields - status_fields
         if missing:
             raise CodingSolutionValidationError(
                 f"Solution JSON is missing required field(s): {', '.join(sorted(missing))}."
@@ -186,14 +260,34 @@ class CodingAgent(BaseAgent):
             raise CodingSolutionValidationError("Solution field 'language' cannot be empty.")
         if not payload["summary"].strip():
             raise CodingSolutionValidationError("Solution field 'summary' cannot be empty.")
-        if not payload["code"].strip():
-            raise CodingSolutionValidationError("Solution field 'code' cannot be empty.")
         if not isinstance(payload["dependencies"], list) or any(
             not isinstance(dependency, str) or not dependency.strip()
             for dependency in payload["dependencies"]
         ):
             raise CodingSolutionValidationError(
                 "Solution field 'dependencies' must be a list of non-empty strings."
+            )
+
+        task_completed = payload.get("task_completed", True)
+        needs_input = payload.get("needs_input", False)
+        clarification_question = payload.get("clarification_question")
+        if not isinstance(task_completed, bool) or not isinstance(needs_input, bool):
+            raise CodingSolutionValidationError("task_completed and needs_input must be booleans.")
+        if clarification_question is not None and not isinstance(clarification_question, str):
+            raise CodingSolutionValidationError("clarification_question must be a string or null.")
+        if needs_input and (task_completed or not (clarification_question or "").strip()):
+            raise CodingSolutionValidationError(
+                "A needs_input solution must be incomplete and include a clarification question."
+            )
+        if not needs_input and clarification_question is not None:
+            raise CodingSolutionValidationError(
+                "clarification_question must be null unless needs_input is true."
+            )
+        if task_completed and not payload["code"].strip():
+            raise CodingSolutionValidationError("A completed solution must include non-empty code.")
+        if task_completed and _is_obvious_stub(payload["code"]):
+            raise CodingSolutionValidationError(
+                "Coding solution contains an obvious placeholder instead of an implementation."
             )
 
         return CodingSolution(
@@ -203,4 +297,27 @@ class CodingAgent(BaseAgent):
             tests=payload["tests"],
             dependencies=payload["dependencies"],
             run_instructions=payload["run_instructions"],
+            task_completed=task_completed,
+            needs_input=needs_input,
+            clarification_question=clarification_question,
         )
+
+
+def _is_obvious_stub(code: str) -> bool:
+    """Reject unmistakable generated placeholders without executing code."""
+    normalized = code.strip()
+    lowered = normalized.casefold()
+    return (
+        normalized in {"...", "pass", "raise NotImplementedError"}
+        or bool(re.fullmatch(r"(?:async\s+)?def\s+\w+\s*\([^)]*\)\s*:\s*(?:pass|\.\.\.)", normalized))
+        or bool(re.search(r"(?im)^\s*(?:#|//)\s*TODO\b", code))
+        or "notimplementederror" in lowered
+        or normalized == "# implementation omitted"
+    )
+
+
+def _sum_optional(first: int | None, second: int | None) -> int | None:
+    """Sum token counts when both calls provide them, retaining partial data."""
+    if first is None and second is None:
+        return None
+    return (first or 0) + (second or 0)

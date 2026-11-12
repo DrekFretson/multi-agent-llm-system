@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,incident_type,actor_id,task_id,reason,blocked
+2026-11-12T15:40:11.030Z,ba521dcb-3a0d-4a11-911b-1332a4049042,90920409-d357-4917-89da-c72773f46102,instruction_conflict,coding_agent,instruction-task,A lower-precedence instruction contradicted the selected trusted instruction.,True

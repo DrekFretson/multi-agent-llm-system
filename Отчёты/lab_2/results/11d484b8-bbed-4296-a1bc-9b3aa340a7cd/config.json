@@ -1,0 +1,22 @@
+{
+  "experiment_id": "11d484b8-bbed-4296-a1bc-9b3aa340a7cd",
+  "lab_id": "lab_2",
+  "created_at": "2026-11-12T15:40:10.661Z",
+  "configuration": {
+    "experiment": "lab_2_task_allocation",
+    "version": 1,
+    "seed": 20502,
+    "repeats": 3,
+    "dataset": "../datasets/lab_2_scenarios.json",
+    "coordination_cost_per_message_units": 1.0,
+    "cost_unit_definition": "One coordination message has one abstract coordination-cost unit; this is not a monetary price.",
+    "auction": {
+      "weights": {
+        "time": 0.3,
+        "cost": 0.2,
+        "load": 0.15,
+        "competence": 0.35
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+timestamp,run_id,experiment_id,task_id,agent_role,error_type,error_message
+2026-11-12T15:36:21.138Z,956b63bc-18ab-48f4-8767-e9673ebe00a1,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_research_2,research_fast,TaskExecutionError,Synthetic local failure injected for research_fast.
+2026-11-12T15:36:21.138Z,956b63bc-18ab-48f4-8767-e9673ebe00a1,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_unavailable,,TaskExecutionError,No available agent has the capability and capacity.

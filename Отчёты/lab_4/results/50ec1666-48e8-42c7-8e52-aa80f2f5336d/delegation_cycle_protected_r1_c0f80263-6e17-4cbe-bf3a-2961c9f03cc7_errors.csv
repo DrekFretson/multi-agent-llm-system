@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,agent_id,error_type,error_message
+2026-11-12T15:36:43.743Z,c0f80263-6e17-4cbe-bf3a-2961c9f03cc7,50ec1666-48e8-42c7-8e52-aa80f2f5336d,ebf37e1d-3ea7-416a-a6d9-6e4da940a662,coding_agent,SecurityIncident,DelegationManager found the research role in task ancestry.

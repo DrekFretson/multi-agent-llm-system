@@ -1,0 +1,23 @@
+{
+  "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+  "lab_id": "lab_4",
+  "created_at": "2026-11-12T15:40:10.934Z",
+  "configuration": {
+    "experiment": "lab_4_reliability_security",
+    "version": 1,
+    "seed": 40504,
+    "repeats": 3,
+    "dataset": "../datasets/lab_4_scenarios.json",
+    "payload_limit_bytes": 4096,
+    "max_delegation_depth": 5,
+    "max_delegation_handoffs": 5,
+    "instruction_precedence": [
+      "system",
+      "security_policy",
+      "task_owner",
+      "delegated_context",
+      "agent_output",
+      "untrusted_data"
+    ]
+  }
+}

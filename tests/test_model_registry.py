@@ -47,6 +47,7 @@ def test_default_config_loads_multiple_models_and_null_values() -> None:
 
     assert registry.has_model("reasoning")
     assert registry.has_model("coding")
+    assert registry.has_model("math")
     assert registry.get_model("reasoning").context_window == 1_000_000
     assert registry.get_model("reasoning").cost.input_per_1m_tokens == 0.0
     assert registry.get_model("reasoning").capabilities == (
@@ -62,6 +63,10 @@ def test_default_config_loads_multiple_models_and_null_values() -> None:
         "reasoning",
         "tool_calling",
     )
+    math_model = registry.get_model("math")
+    assert math_model.model_id == "google/gemma-4-31b-it:free"
+    assert math_model.context_window == 262144
+    assert math_model.capabilities == ("text_generation", "reasoning", "math")
 
 
 def test_loads_multiple_models_and_resolves_logical_id(tmp_path: Path) -> None:

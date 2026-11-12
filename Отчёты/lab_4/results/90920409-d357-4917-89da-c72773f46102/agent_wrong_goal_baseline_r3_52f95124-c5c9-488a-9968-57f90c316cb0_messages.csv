@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:40:11.058Z,52f95124-c5c9-488a-9968-57f90c316cb0,90920409-d357-4917-89da-c72773f46102,legitimate-agent_wrong_goal,a286c2d7-ad3f-4ec7-80d3-f67cd2d7597a,coordinator,coding_agent,TASK_ASSIGN,delivered,,

@@ -3,28 +3,38 @@ agents:
     model: reasoning
     generation:
       temperature: 0.05
-      max_tokens: 4000
+      max_tokens: 32768
+      reasoning:
+        max_tokens: 8192
 
   research:
     model: reasoning
     generation:
       temperature: 0.1
-      max_tokens: 3000
+      max_tokens: 32768
+      reasoning:
+        max_tokens: 8192
 
   coding:
     model: coding
     generation:
       temperature: 0.05
-      max_tokens: 3000
+      max_tokens: 32000
+      reasoning:
+        max_tokens: 8000
 
   math:
-    model: reasoning
+    model: math
     generation:
       temperature: 0.05
-      max_tokens: 4000
+      max_tokens: 16384
+      reasoning:
+        max_tokens: 4096
 
   critic:
     model: reasoning
     generation:
       temperature: 0.025
-      max_tokens: 3500
+      max_tokens: 32768
+      reasoning:
+        max_tokens: 8192

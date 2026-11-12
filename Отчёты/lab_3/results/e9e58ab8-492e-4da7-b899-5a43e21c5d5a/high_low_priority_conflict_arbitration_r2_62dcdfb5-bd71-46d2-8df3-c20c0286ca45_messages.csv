@@ -1,0 +1,10 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:37:17.106Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_high_second,7ff437c7-121d-4804-9c6f-3ed2522cb555,lab3_coordinator,coding_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:17.106Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_high_second,af33bcdc-524e-4ca1-a1a7-c329a70f51f0,lab3_coordinator,coding_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:37:17.106Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_high_second,ae446981-a75d-49a2-834d-627126ba5d77,coding_agent,lab3_coordinator,NEGOTIATION_ACCEPT,delivered,,
+2026-11-12T15:37:17.106Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_medium_third,149324df-fa60-49ea-b318-ed5cab61c4c7,lab3_coordinator,critic_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:17.106Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_medium_third,1ffd1b71-9d41-4022-8661-3ede1071426b,lab3_coordinator,critic_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:37:17.106Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_medium_third,70b50c7b-c108-4b1c-868c-02fd93d6d94f,critic_agent,lab3_coordinator,NEGOTIATION_ACCEPT,delivered,,
+2026-11-12T15:37:17.107Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_low_first,3fac606c-6776-4483-a0f8-6bc7903fd236,lab3_coordinator,research_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:17.107Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_low_first,afe84e26-a47e-4827-8678-663b178cb767,lab3_coordinator,research_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:37:17.107Z,62dcdfb5-bd71-46d2-8df3-c20c0286ca45,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_low_first,1387a185-0c78-4347-a9f6-ae35bafdde5e,research_agent,lab3_coordinator,NEGOTIATION_ACCEPT,delivered,,

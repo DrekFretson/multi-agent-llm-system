@@ -1,0 +1,109 @@
+{
+  "timestamp": "2026-11-12T15:36:43.719Z",
+  "finished_at": "2026-11-12T15:36:43.719Z",
+  "run_id": "8cfb4bfb-4bac-4b91-8be2-579b79e87935",
+  "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+  "duration_ms": 0.814,
+  "api_calls": 1,
+  "llm_api_calls": 0,
+  "external_api_calls": 1,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "estimated_cost": null,
+  "known_prompt_tokens_subtotal": null,
+  "known_completion_tokens_subtotal": null,
+  "known_cost_subtotal": null,
+  "unknown_cost_calls": 0,
+  "incomplete_cost_calls": 0,
+  "missing_usage_calls": 0,
+  "error_count": 2,
+  "message_count": 1,
+  "incident_count": 0,
+  "task_count": 2,
+  "agent_invocations": 0,
+  "retry_count": 0,
+  "critic_calls": 0,
+  "critic_cycles": null,
+  "quality": {
+    "detected": false,
+    "blocked": false,
+    "false_blocks": 0,
+    "execution_status": "PARTIAL"
+  },
+  "llm_calls": [],
+  "external_calls": [
+    {
+      "timestamp": "2026-11-12T15:36:43.719Z",
+      "run_id": "8cfb4bfb-4bac-4b91-8be2-579b79e87935",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "research-search",
+      "service": "tavily",
+      "agent_id": "research_agent",
+      "agent_role": "research",
+      "duration_ms": 0.068,
+      "success": false,
+      "error_type": "SearchAPIError",
+      "error_message": "The Tavily search API returned an error."
+    }
+  ],
+  "security_incidents": [],
+  "tasks": [
+    {
+      "timestamp": "2026-11-12T15:36:43.719Z",
+      "run_id": "8cfb4bfb-4bac-4b91-8be2-579b79e87935",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "research-search",
+      "agent_role": "research",
+      "status": "FAILED",
+      "duration_ms": 0.0,
+      "error": "Search tool unavailable."
+    },
+    {
+      "timestamp": "2026-11-12T15:36:43.719Z",
+      "run_id": "8cfb4bfb-4bac-4b91-8be2-579b79e87935",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "legitimate-tool_unavailable",
+      "agent_role": "coding",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    }
+  ],
+  "agents": [],
+  "messages": [
+    {
+      "timestamp": "2026-11-12T15:36:43.719Z",
+      "run_id": "8cfb4bfb-4bac-4b91-8be2-579b79e87935",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "legitimate-tool_unavailable",
+      "message_id": "7dc28c87-60d9-4f83-933a-df05f8a4dbe4",
+      "sender": "coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "errors": [
+    {
+      "timestamp": "2026-11-12T15:36:43.719Z",
+      "run_id": "8cfb4bfb-4bac-4b91-8be2-579b79e87935",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "research-search",
+      "agent_id": "research_agent",
+      "error_type": "SearchAPIError",
+      "error_message": "The Tavily search API returned an error."
+    },
+    {
+      "timestamp": "2026-11-12T15:36:43.719Z",
+      "run_id": "8cfb4bfb-4bac-4b91-8be2-579b79e87935",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "research-search",
+      "agent_role": "research",
+      "error_type": "TaskExecutionError",
+      "error_message": "Search tool unavailable."
+    }
+  ]
+}

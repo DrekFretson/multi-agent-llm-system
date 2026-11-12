@@ -1,0 +1,97 @@
+{
+  "timestamp": "2026-11-12T15:40:11.078Z",
+  "finished_at": "2026-11-12T15:40:11.078Z",
+  "run_id": "ee440771-211c-48b7-9017-5571ef79cf5e",
+  "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+  "duration_ms": 0.227,
+  "api_calls": 0,
+  "llm_api_calls": 0,
+  "external_api_calls": 0,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "estimated_cost": null,
+  "known_prompt_tokens_subtotal": null,
+  "known_completion_tokens_subtotal": null,
+  "known_cost_subtotal": null,
+  "unknown_cost_calls": 0,
+  "incomplete_cost_calls": 0,
+  "missing_usage_calls": 0,
+  "error_count": 1,
+  "message_count": 1,
+  "incident_count": 1,
+  "task_count": 2,
+  "agent_invocations": 0,
+  "retry_count": 0,
+  "critic_calls": 0,
+  "critic_cycles": null,
+  "quality": {
+    "detected": true,
+    "blocked": true,
+    "false_blocks": 0,
+    "execution_status": "COMPLETED"
+  },
+  "llm_calls": [],
+  "external_calls": [],
+  "security_incidents": [
+    {
+      "timestamp": "2026-11-12T15:40:11.078Z",
+      "run_id": "ee440771-211c-48b7-9017-5571ef79cf5e",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "incident_type": "instruction_conflict",
+      "actor_id": "coding_agent",
+      "task_id": "instruction-task",
+      "reason": "A lower-precedence instruction contradicted the selected trusted instruction.",
+      "blocked": true
+    }
+  ],
+  "tasks": [
+    {
+      "timestamp": "2026-11-12T15:40:11.078Z",
+      "run_id": "ee440771-211c-48b7-9017-5571ef79cf5e",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "instruction-task",
+      "agent_role": "coding",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "timestamp": "2026-11-12T15:40:11.078Z",
+      "run_id": "ee440771-211c-48b7-9017-5571ef79cf5e",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "legitimate-conflicting_instructions",
+      "agent_role": "coding",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    }
+  ],
+  "agents": [],
+  "messages": [
+    {
+      "timestamp": "2026-11-12T15:40:11.078Z",
+      "run_id": "ee440771-211c-48b7-9017-5571ef79cf5e",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "legitimate-conflicting_instructions",
+      "message_id": "aed7cd6e-ed07-432f-845b-b3ea5da273fe",
+      "sender": "coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "errors": [
+    {
+      "timestamp": "2026-11-12T15:40:11.078Z",
+      "run_id": "ee440771-211c-48b7-9017-5571ef79cf5e",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "instruction-task",
+      "agent_id": "coding_agent",
+      "error_type": "SecurityIncident",
+      "error_message": "A lower-precedence instruction contradicted the selected trusted instruction."
+    }
+  ]
+}

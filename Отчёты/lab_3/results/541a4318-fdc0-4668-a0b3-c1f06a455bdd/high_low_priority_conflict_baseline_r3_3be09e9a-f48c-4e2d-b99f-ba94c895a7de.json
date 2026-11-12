@@ -1,0 +1,172 @@
+{
+  "timestamp": "2026-11-12T15:36:25.479Z",
+  "finished_at": "2026-11-12T15:36:25.481Z",
+  "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+  "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+  "duration_ms": 1.452,
+  "api_calls": 0,
+  "llm_api_calls": 0,
+  "external_api_calls": 0,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "estimated_cost": null,
+  "known_prompt_tokens_subtotal": null,
+  "known_completion_tokens_subtotal": null,
+  "known_cost_subtotal": null,
+  "unknown_cost_calls": 0,
+  "incomplete_cost_calls": 0,
+  "missing_usage_calls": 0,
+  "error_count": 2,
+  "message_count": 6,
+  "incident_count": 0,
+  "task_count": 3,
+  "agent_invocations": 0,
+  "retry_count": 0,
+  "critic_calls": 0,
+  "critic_cycles": null,
+  "quality": {
+    "execution_status": "PARTIAL",
+    "conflicts": 1,
+    "resolved_conflicts": 0,
+    "unresolved_conflicts": 1,
+    "priority_violations": 2,
+    "jain_fairness_index": 0.3333333333333333
+  },
+  "llm_calls": [],
+  "external_calls": [],
+  "security_incidents": [],
+  "tasks": [
+    {
+      "timestamp": "2026-11-12T15:36:25.480Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_low_first",
+      "agent_role": "research_agent",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:25.481Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_high_second",
+      "agent_role": null,
+      "status": "SKIPPED",
+      "duration_ms": 0.0,
+      "error": "Capacity exhausted; baseline does not negotiate."
+    },
+    {
+      "timestamp": "2026-11-12T15:36:25.481Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_medium_third",
+      "agent_role": null,
+      "status": "SKIPPED",
+      "duration_ms": 0.0,
+      "error": "Capacity exhausted; baseline does not negotiate."
+    }
+  ],
+  "agents": [],
+  "messages": [
+    {
+      "timestamp": "2026-11-12T15:36:25.480Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_low_first",
+      "message_id": "e02f9584-4f29-453a-b7f7-abb85ef922a5",
+      "sender": "lab3_coordinator",
+      "receiver": "research_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:25.480Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_low_first",
+      "message_id": "5b0a384d-f8a5-46d5-a42b-8f0078f5d1e0",
+      "sender": "research_agent",
+      "receiver": "lab3_coordinator",
+      "message_type": "TASK_ACCEPT",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:25.480Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_high_second",
+      "message_id": "21fd713f-ff28-4a6a-a6db-a5f11796a889",
+      "sender": "lab3_coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:25.480Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_high_second",
+      "message_id": "178b6182-29b2-4480-b4cb-bad5e7fc972e",
+      "sender": "coding_agent",
+      "receiver": "lab3_coordinator",
+      "message_type": "TASK_REJECT",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:25.480Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_medium_third",
+      "message_id": "7aa94d40-e259-48a2-a688-d07d82fa47bd",
+      "sender": "lab3_coordinator",
+      "receiver": "critic_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:25.480Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_medium_third",
+      "message_id": "8c691cbd-e4a5-48ca-acb8-5614cc38efd7",
+      "sender": "critic_agent",
+      "receiver": "lab3_coordinator",
+      "message_type": "TASK_REJECT",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "errors": [
+    {
+      "timestamp": "2026-11-12T15:36:25.481Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_high_second",
+      "agent_role": null,
+      "error_type": "TaskExecutionError",
+      "error_message": "Capacity exhausted; baseline does not negotiate."
+    },
+    {
+      "timestamp": "2026-11-12T15:36:25.481Z",
+      "run_id": "3be09e9a-f48c-4e2d-b99f-ba94c895a7de",
+      "experiment_id": "541a4318-fdc0-4668-a0b3-c1f06a455bdd",
+      "task_id": "task_medium_third",
+      "agent_role": null,
+      "error_type": "TaskExecutionError",
+      "error_message": "Capacity exhausted; baseline does not negotiate."
+    }
+  ]
+}

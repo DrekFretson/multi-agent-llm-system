@@ -1,0 +1,3 @@
+timestamp,run_id,experiment_id,task_id,agent_id,error_type,error_message,agent_role
+2026-11-12T15:40:11.049Z,4bc20b2c-69b0-4e45-9b97-c2799387978d,90920409-d357-4917-89da-c72773f46102,research-search,research_agent,SearchAPIError,The Tavily search API returned an error.,
+2026-11-12T15:40:11.049Z,4bc20b2c-69b0-4e45-9b97-c2799387978d,90920409-d357-4917-89da-c72773f46102,research-search,,TaskExecutionError,Search tool unavailable.,research

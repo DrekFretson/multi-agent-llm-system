@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,incident_type,actor_id,task_id,reason,blocked
+2026-11-12T15:40:10.997Z,1a39dd07-4154-4049-976c-e5c729b4daa6,90920409-d357-4917-89da-c72773f46102,message_authority,attacker,forged-task,Role 'untrusted' may not send TASK_ASSIGN.,True

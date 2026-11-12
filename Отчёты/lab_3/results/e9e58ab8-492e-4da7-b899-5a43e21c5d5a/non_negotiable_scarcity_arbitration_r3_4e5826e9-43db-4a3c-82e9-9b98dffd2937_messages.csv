@@ -1,0 +1,7 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:37:17.158Z,4e5826e9-43db-4a3c-82e9-9b98dffd2937,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_coding,935f443a-69ee-45fa-95bd-a7b2d8eeaf2c,lab3_coordinator,coding_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:17.158Z,4e5826e9-43db-4a3c-82e9-9b98dffd2937,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_review,24384a91-d4af-478f-b344-a2e802aa7586,lab3_coordinator,critic_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:17.158Z,4e5826e9-43db-4a3c-82e9-9b98dffd2937,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_review,867841f3-e612-42af-bd37-7b34fa12bbb5,critic_agent,lab3_coordinator,NEGOTIATION_ACCEPT,delivered,,
+2026-11-12T15:37:17.159Z,4e5826e9-43db-4a3c-82e9-9b98dffd2937,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_research,681a83f9-6f0e-4e00-abf5-ca1dcf35073e,lab3_coordinator,research_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:17.159Z,4e5826e9-43db-4a3c-82e9-9b98dffd2937,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_coding,7a854653-86df-4e94-800a-1dcad762b3b5,lab3_coordinator,coding_agent,ARBITRATION_DECISION,delivered,,
+2026-11-12T15:37:17.159Z,4e5826e9-43db-4a3c-82e9-9b98dffd2937,e9e58ab8-492e-4da7-b899-5a43e21c5d5a,task_research,4077e991-3d80-45b9-b262-0e98ab65bf03,lab3_coordinator,research_agent,ARBITRATION_DECISION,delivered,,

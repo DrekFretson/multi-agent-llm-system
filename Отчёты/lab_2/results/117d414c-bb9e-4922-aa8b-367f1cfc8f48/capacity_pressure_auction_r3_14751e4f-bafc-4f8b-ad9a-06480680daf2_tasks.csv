@@ -1,0 +1,5 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:36:21.179Z,14751e4f-bafc-4f8b-ad9a-06480680daf2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,pressure_code_1,coder_general,COMPLETED,0.0,
+2026-11-12T15:36:21.179Z,14751e4f-bafc-4f8b-ad9a-06480680daf2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,pressure_code_2,coder_specialist,COMPLETED,0.0,
+2026-11-12T15:36:21.179Z,14751e4f-bafc-4f8b-ad9a-06480680daf2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,pressure_research_1,research_fast,COMPLETED,0.0,
+2026-11-12T15:36:21.179Z,14751e4f-bafc-4f8b-ad9a-06480680daf2,117d414c-bb9e-4922-aa8b-367f1cfc8f48,pressure_review_1,critic,COMPLETED,0.0,

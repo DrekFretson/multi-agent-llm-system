@@ -1,0 +1,3 @@
+timestamp,run_id,experiment_id,task_id,agent_role,error_type,error_message
+2026-11-12T15:36:25.481Z,3be09e9a-f48c-4e2d-b99f-ba94c895a7de,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_high_second,,TaskExecutionError,Capacity exhausted; baseline does not negotiate.
+2026-11-12T15:36:25.481Z,3be09e9a-f48c-4e2d-b99f-ba94c895a7de,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_medium_third,,TaskExecutionError,Capacity exhausted; baseline does not negotiate.

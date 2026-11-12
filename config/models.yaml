@@ -1,5 +1,5 @@
 models:
-  # Catalog metadata checked 2026-11-09:
+  # OpenRouter limits checked 2026-11-12: 1,000,000 context / 65,536 output.
   # https://openrouter.ai/nvidia/nemotron-3-ultra-550b-a55b:free
   reasoning:
     provider: openrouter
@@ -15,6 +15,7 @@ models:
       - math
       - tool_calling
 
+  # OpenRouter limits checked 2026-11-12: 256,000 context / 64,000 output.
   # https://openrouter.ai/cohere/north-mini-code:free
   coding:
     provider: openrouter
@@ -28,3 +29,17 @@ models:
       - code_generation
       - reasoning
       - tool_calling
+
+  math:
+    provider: openrouter
+    # OpenRouter limits checked 2026-11-12: 262,144 context / 32,768 output.
+    # https://openrouter.ai/google/gemma-4-31b-it:free
+    model_id: "google/gemma-4-31b-it:free"
+    cost:
+      input_per_1m_tokens: 0.0
+      output_per_1m_tokens: 0.0
+    context_window: 262144
+    capabilities:
+      - text_generation
+      - reasoning
+      - math

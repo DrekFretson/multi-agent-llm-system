@@ -1,0 +1,7 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:36:21.074Z,958e2663-f829-4b0a-b287-42cd0eaeba48,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_research_1,research_fast,COMPLETED,0.0,
+2026-11-12T15:36:21.074Z,958e2663-f829-4b0a-b287-42cd0eaeba48,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_code_1,coder_specialist,COMPLETED,0.0,
+2026-11-12T15:36:21.074Z,958e2663-f829-4b0a-b287-42cd0eaeba48,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_test_1,coder_general,COMPLETED,0.0,
+2026-11-12T15:36:21.074Z,958e2663-f829-4b0a-b287-42cd0eaeba48,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_review_1,critic,COMPLETED,0.0,
+2026-11-12T15:36:21.074Z,958e2663-f829-4b0a-b287-42cd0eaeba48,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_research_2,research_fast,FAILED,0.0,Synthetic local failure injected for research_fast.
+2026-11-12T15:36:21.074Z,958e2663-f829-4b0a-b287-42cd0eaeba48,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_unavailable,,SKIPPED,0.0,No available agent has the capability and capacity.

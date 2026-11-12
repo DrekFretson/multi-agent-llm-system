@@ -1,0 +1,13 @@
+experiment: lab_2_task_allocation
+version: 1
+seed: 20502
+repeats: 3
+dataset: ../datasets/lab_2_scenarios.json
+coordination_cost_per_message_units: 1.0
+cost_unit_definition: "One coordination message has one abstract coordination-cost unit; this is not a monetary price."
+auction:
+  weights:
+    time: 0.30
+    cost: 0.20
+    load: 0.15
+    competence: 0.35

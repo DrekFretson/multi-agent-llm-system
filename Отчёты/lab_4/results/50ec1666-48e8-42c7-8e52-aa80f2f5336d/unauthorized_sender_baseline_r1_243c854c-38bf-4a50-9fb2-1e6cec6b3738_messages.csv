@@ -1,0 +1,3 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:36:43.710Z,243c854c-38bf-4a50-9fb2-1e6cec6b3738,50ec1666-48e8-42c7-8e52-aa80f2f5336d,forged-task,fa8e89da-dae2-490b-8f8c-9d0eb2421b23,attacker,coordinator,TASK_ASSIGN,delivered,,
+2026-11-12T15:36:43.710Z,243c854c-38bf-4a50-9fb2-1e6cec6b3738,50ec1666-48e8-42c7-8e52-aa80f2f5336d,legitimate-unauthorized_sender,7c858c75-ee71-493b-bf46-f6799a084a37,coordinator,coding_agent,TASK_ASSIGN,delivered,,

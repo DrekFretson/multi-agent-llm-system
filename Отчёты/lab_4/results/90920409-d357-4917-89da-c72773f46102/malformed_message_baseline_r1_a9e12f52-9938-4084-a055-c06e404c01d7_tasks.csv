@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:40:10.936Z,a9e12f52-9938-4084-a055-c06e404c01d7,90920409-d357-4917-89da-c72773f46102,legitimate-malformed_message,coding,COMPLETED,0.0,

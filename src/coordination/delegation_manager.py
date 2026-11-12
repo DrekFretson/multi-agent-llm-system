@@ -99,6 +99,8 @@ class DelegationManager:
         agents: Mapping[str, Any] | None = None,
         logger: Logger | Any | None = None,
         delegation_rules: Mapping[str, set[str] | frozenset[str]] | None = None,
+        max_delegation_depth: int = MAX_DELEGATION_DEPTH,
+        max_handoffs: int = MAX_HANDOFFS,
     ) -> None:
         """Initialize with shared task/message infrastructure and agent adapters."""
         if not isinstance(task_store, TaskStore):
@@ -107,9 +109,14 @@ class DelegationManager:
             raise TypeError("message_bus must be a MessageBus instance.")
         if logger is not None and not callable(getattr(logger, "log_event", None)):
             raise TypeError("logger must provide log_event() or be None.")
+        for name, value in (("max_delegation_depth", max_delegation_depth), ("max_handoffs", max_handoffs)):
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise ValueError(f"{name} must be a non-negative integer.")
         self.task_store = task_store
         self.message_bus = message_bus
         self.logger = logger
+        self.max_delegation_depth = max_delegation_depth
+        self.max_handoffs = max_handoffs
         self.agents = dict(agents or {})
         raw_rules = delegation_rules or DEFAULT_DELEGATION_RULES
         self.delegation_rules = {
@@ -188,13 +195,17 @@ class DelegationManager:
                     )
                 root_id, depth, ancestry = self._task_lineage(parent)
                 child_depth = depth + 1
-                if child_depth > self.MAX_DELEGATION_DEPTH:
+                if child_depth > self.max_delegation_depth:
                     raise DelegationLimitError(
-                        f"Delegation depth {child_depth} exceeds maximum {self.MAX_DELEGATION_DEPTH}."
+                        f"Delegation depth {child_depth} exceeds maximum {self.max_delegation_depth}."
                     )
-                if self._handoffs_by_root.get(root_id, 0) >= self.MAX_HANDOFFS:
+                handoffs = max(
+                    self._handoffs_by_root.get(root_id, 0),
+                    self._count_delegated_descendants(root_id),
+                )
+                if handoffs >= self.max_handoffs:
                     raise DelegationLimitError(
-                        f"Root task {root_id!r} has reached {self.MAX_HANDOFFS} handoffs."
+                        f"Root task {root_id!r} has reached {self.max_handoffs} handoffs."
                     )
                 if target_role in ancestry or recipient_id in ancestry:
                     raise DelegationCycleError(
@@ -207,6 +218,7 @@ class DelegationManager:
                     task_type=self._task_type(target_role),
                     priority=parent.priority,
                     parent_task_id=parent_task_id,
+                    delegation_depth=child_depth,
                 )
                 self.task_store.create_task(child)
                 self._log("delegation_child_created", root_task_id=root_id,
@@ -463,7 +475,31 @@ class DelegationManager:
             if item.assignee:
                 ancestry.add(item.assignee)
                 ancestry.add(self._agent_role(item.assignee))
-        return current.task_id, len(chain) - 1, ancestry
+        return current.task_id, max(len(chain) - 1, parent.delegation_depth), ancestry
+
+    def _count_delegated_descendants(self, root_id: str) -> int:
+        """Count persisted delegated tasks so a new manager cannot reset handoff caps."""
+        count = 0
+        for task in self.task_store.get_all_tasks():
+            if task.delegation_depth <= 0:
+                continue
+            current = task
+            visited: set[str] = set()
+            belongs_to_root = False
+            while current.task_id not in visited:
+                if current.task_id == root_id:
+                    belongs_to_root = True
+                    break
+                visited.add(current.task_id)
+                if current.parent_task_id is None:
+                    break
+                try:
+                    current = self.task_store.get_task(current.parent_task_id)
+                except TaskNotFoundError:
+                    break
+            if belongs_to_root:
+                count += 1
+        return count
 
     def _require_registered(self, agent_id: str, label: str) -> None:
         if agent_id not in self.message_bus.get_registered_agents():

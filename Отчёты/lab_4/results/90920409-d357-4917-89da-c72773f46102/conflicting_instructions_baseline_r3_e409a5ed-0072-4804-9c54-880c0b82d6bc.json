@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-11-12T15:40:11.074Z",
+  "finished_at": "2026-11-12T15:40:11.074Z",
+  "run_id": "e409a5ed-0072-4804-9c54-880c0b82d6bc",
+  "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+  "duration_ms": 0.117,
+  "api_calls": 0,
+  "llm_api_calls": 0,
+  "external_api_calls": 0,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "estimated_cost": null,
+  "known_prompt_tokens_subtotal": null,
+  "known_completion_tokens_subtotal": null,
+  "known_cost_subtotal": null,
+  "unknown_cost_calls": 0,
+  "incomplete_cost_calls": 0,
+  "missing_usage_calls": 0,
+  "error_count": 0,
+  "message_count": 1,
+  "incident_count": 0,
+  "task_count": 2,
+  "agent_invocations": 0,
+  "retry_count": 0,
+  "critic_calls": 0,
+  "critic_cycles": null,
+  "quality": {
+    "detected": false,
+    "blocked": false,
+    "false_blocks": 0,
+    "execution_status": "COMPLETED"
+  },
+  "llm_calls": [],
+  "external_calls": [],
+  "security_incidents": [],
+  "tasks": [
+    {
+      "timestamp": "2026-11-12T15:40:11.074Z",
+      "run_id": "e409a5ed-0072-4804-9c54-880c0b82d6bc",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "instruction-task",
+      "agent_role": "coding",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "timestamp": "2026-11-12T15:40:11.074Z",
+      "run_id": "e409a5ed-0072-4804-9c54-880c0b82d6bc",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "legitimate-conflicting_instructions",
+      "agent_role": "coding",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    }
+  ],
+  "agents": [],
+  "messages": [
+    {
+      "timestamp": "2026-11-12T15:40:11.074Z",
+      "run_id": "e409a5ed-0072-4804-9c54-880c0b82d6bc",
+      "experiment_id": "90920409-d357-4917-89da-c72773f46102",
+      "task_id": "legitimate-conflicting_instructions",
+      "message_id": "21635cb5-3bb1-462a-bba2-edcf9b85acc1",
+      "sender": "coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,3 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:36:43.848Z,3eb033e2-e414-4a77-8e1f-bded276ccc38,50ec1666-48e8-42c7-8e52-aa80f2f5336d,bad-contract,06f657db-1800-45e0-b0b2-80791128ce94,coordinator,coding_agent,TASK_ASSIGN,blocked,MessageAuthorizationError,Message '06f657db-1800-45e0-b0b2-80791128ce94' was blocked by authorization policy.
+2026-11-12T15:36:43.848Z,3eb033e2-e414-4a77-8e1f-bded276ccc38,50ec1666-48e8-42c7-8e52-aa80f2f5336d,legitimate-malformed_message,23f6d793-5cb3-4aec-954b-1fe2eed79488,coordinator,coding_agent,TASK_ASSIGN,delivered,,

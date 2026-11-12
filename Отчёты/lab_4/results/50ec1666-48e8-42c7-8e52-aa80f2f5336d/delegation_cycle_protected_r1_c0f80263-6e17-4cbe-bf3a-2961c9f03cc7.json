@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-11-12T15:36:43.742Z",
+  "finished_at": "2026-11-12T15:36:43.743Z",
+  "run_id": "c0f80263-6e17-4cbe-bf3a-2961c9f03cc7",
+  "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+  "duration_ms": 1.508,
+  "api_calls": 0,
+  "llm_api_calls": 0,
+  "external_api_calls": 0,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "estimated_cost": null,
+  "known_prompt_tokens_subtotal": null,
+  "known_completion_tokens_subtotal": null,
+  "known_cost_subtotal": null,
+  "unknown_cost_calls": 0,
+  "incomplete_cost_calls": 0,
+  "missing_usage_calls": 0,
+  "error_count": 1,
+  "message_count": 2,
+  "incident_count": 1,
+  "task_count": 3,
+  "agent_invocations": 0,
+  "retry_count": 0,
+  "critic_calls": 0,
+  "critic_cycles": null,
+  "quality": {
+    "detected": true,
+    "blocked": true,
+    "false_blocks": 0,
+    "execution_status": "COMPLETED"
+  },
+  "llm_calls": [],
+  "external_calls": [],
+  "security_incidents": [
+    {
+      "timestamp": "2026-11-12T15:36:43.743Z",
+      "run_id": "c0f80263-6e17-4cbe-bf3a-2961c9f03cc7",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "incident_type": "delegation_cycle",
+      "actor_id": "coding_agent",
+      "task_id": "ebf37e1d-3ea7-416a-a6d9-6e4da940a662",
+      "reason": "DelegationManager found the research role in task ancestry.",
+      "blocked": true
+    }
+  ],
+  "tasks": [
+    {
+      "timestamp": "2026-11-12T15:36:43.743Z",
+      "run_id": "c0f80263-6e17-4cbe-bf3a-2961c9f03cc7",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "cycle-root",
+      "agent_role": "research",
+      "status": "RUNNING",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:43.743Z",
+      "run_id": "c0f80263-6e17-4cbe-bf3a-2961c9f03cc7",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "ebf37e1d-3ea7-416a-a6d9-6e4da940a662",
+      "agent_role": "coding",
+      "status": "WAITING",
+      "duration_ms": 0.0,
+      "error": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:43.743Z",
+      "run_id": "c0f80263-6e17-4cbe-bf3a-2961c9f03cc7",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "legitimate-delegation_cycle",
+      "agent_role": "coding",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    }
+  ],
+  "agents": [],
+  "messages": [
+    {
+      "timestamp": "2026-11-12T15:36:43.743Z",
+      "run_id": "c0f80263-6e17-4cbe-bf3a-2961c9f03cc7",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "ebf37e1d-3ea7-416a-a6d9-6e4da940a662",
+      "message_id": "c214f20d-4a95-4e21-9760-df67ffa661ff",
+      "sender": "research_agent",
+      "receiver": "coding_agent",
+      "message_type": "HELP_REQUEST",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    },
+    {
+      "timestamp": "2026-11-12T15:36:43.743Z",
+      "run_id": "c0f80263-6e17-4cbe-bf3a-2961c9f03cc7",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "legitimate-delegation_cycle",
+      "message_id": "a4249532-93ef-4e23-8fab-fa9285573a48",
+      "sender": "coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "errors": [
+    {
+      "timestamp": "2026-11-12T15:36:43.743Z",
+      "run_id": "c0f80263-6e17-4cbe-bf3a-2961c9f03cc7",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "ebf37e1d-3ea7-416a-a6d9-6e4da940a662",
+      "agent_id": "coding_agent",
+      "error_type": "SecurityIncident",
+      "error_message": "DelegationManager found the research role in task ancestry."
+    }
+  ]
+}

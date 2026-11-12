@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,agent_role,error_type,error_message
+2026-11-12T15:36:25.416Z,ce8d0ef7-b118-49e5-bde6-10414d0cedec,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,,TaskExecutionError,Arbitrator applied configured priority/value/arrival rule after negotiation.

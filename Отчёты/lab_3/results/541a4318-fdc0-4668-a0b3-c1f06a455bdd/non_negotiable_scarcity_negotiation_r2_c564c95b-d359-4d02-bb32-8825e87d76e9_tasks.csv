@@ -1,0 +1,4 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:36:25.469Z,c564c95b-d359-4d02-bb32-8825e87d76e9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_research,research_agent,COMPLETED,0.0,
+2026-11-12T15:36:25.469Z,c564c95b-d359-4d02-bb32-8825e87d76e9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_coding,,SKIPPED,0.0,Negotiation ended without an acceptable offer.
+2026-11-12T15:36:25.469Z,c564c95b-d359-4d02-bb32-8825e87d76e9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_review,critic_agent,COMPLETED,0.0,

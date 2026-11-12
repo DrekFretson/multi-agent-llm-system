@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 import os
 import threading
+import time
 from dataclasses import dataclass
 from typing import Any, Iterable
 from urllib.parse import urlsplit, urlunsplit
@@ -162,10 +163,37 @@ class SearchTool:
     def log_event(self, event_type: str, **fields: Any) -> None:
         """Write a best-effort structured search event without affecting work."""
         record = dict(fields)
+        try:
+            from src.evaluation.metrics import current_metric_context
+
+            context = current_metric_context()
+            if context is not None:
+                record.setdefault("run_id", context.run_id)
+                record.setdefault("experiment_id", context.experiment_id)
+                record.setdefault("task_id", context.task_id)
+                if context.agent_role is not None:
+                    record.setdefault("agent_role", context.agent_role)
+        except Exception:
+            pass
         if self.agent_id is not None:
             record.setdefault("agent_id", self.agent_id)
         try:
             self._logger.log_event(event_type, **record)
+        except Exception:
+            return
+
+    def _record_metrics_call(self, started: float, error: Exception | None) -> None:
+        """Record an actual Tavily request without including query or credentials."""
+        try:
+            from src.evaluation.metrics import record_current_external_call
+
+            record_current_external_call(
+                service="tavily", agent_id=self.agent_id,
+                duration_ms=(time.perf_counter() - started) * 1000,
+                success=error is None,
+                error_type=type(error).__name__ if error is not None else None,
+                error_message=str(error) if error is not None else None,
+            )
         except Exception:
             return
 
@@ -223,8 +251,10 @@ class SearchTool:
             return []
         self.log_event("tavily_search_started", query_count=1)
 
+        request_started: float | None = None
         try:
             self._ensure_client()
+            request_started = time.perf_counter()
             response = self._client.search(
                 query=query.strip(),
                 max_results=max_results,
@@ -250,9 +280,13 @@ class SearchTool:
                     break
         except Exception as error:
             translated = error if isinstance(error, SearchToolError) else self._translate_error(error)
+            if request_started is not None:
+                self._record_metrics_call(request_started, translated)
             self._record_failure(translated)
             raise translated from None
 
+        if request_started is not None:
+            self._record_metrics_call(request_started, None)
         self.last_search_status = "completed" if results else "no_results"
         self.log_event("tavily_search_succeeded", result_count=len(results), query_count=1)
         return results

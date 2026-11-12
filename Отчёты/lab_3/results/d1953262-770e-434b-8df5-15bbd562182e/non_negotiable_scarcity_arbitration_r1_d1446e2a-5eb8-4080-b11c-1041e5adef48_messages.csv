@@ -1,0 +1,11 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:40:10.851Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_coding,a887cb1d-472a-4a84-acd5-cb1cb8e64273,lab3_coordinator,coding_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:40:10.851Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_review,29284f4c-51ae-46e5-9ed4-0b092c4a4fed,lab3_coordinator,critic_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:40:10.851Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_review,0b269c00-e6a5-4dd1-9244-77a518f869d5,lab3_coordinator,critic_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:40:10.851Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_review,3ec4f7f2-1a79-430f-98a0-bb7abb5100fa,lab3_coordinator,critic_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:40:10.851Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_review,382a2f4c-8ea6-40d5-a52d-363a053a37db,lab3_coordinator,critic_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:40:10.851Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_review,4cfa870e-4f57-4e0c-876e-447c4498cc4b,critic_agent,lab3_coordinator,NEGOTIATION_REJECT,delivered,,
+2026-11-12T15:40:10.851Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_research,c878a08c-ad24-4070-85a4-9fcffaa8bf7a,lab3_coordinator,research_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:40:10.851Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_coding,16fd8f5b-02e9-4164-951f-41d31e9e8dd1,lab3_coordinator,coding_agent,ARBITRATION_DECISION,delivered,,
+2026-11-12T15:40:10.852Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_review,aab54849-5daa-4abc-84ed-10f09b20429f,lab3_coordinator,critic_agent,ARBITRATION_DECISION,delivered,,
+2026-11-12T15:40:10.852Z,d1446e2a-5eb8-4080-b11c-1041e5adef48,d1953262-770e-434b-8df5-15bbd562182e,task_research,ab83f808-561f-4677-89a0-bb8eb41479b0,lab3_coordinator,research_agent,ARBITRATION_DECISION,delivered,,

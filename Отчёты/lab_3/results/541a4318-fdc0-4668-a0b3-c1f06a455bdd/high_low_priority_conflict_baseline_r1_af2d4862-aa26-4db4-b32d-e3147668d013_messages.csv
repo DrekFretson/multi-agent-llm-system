@@ -1,0 +1,7 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:36:25.403Z,af2d4862-aa26-4db4-b32d-e3147668d013,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,1ca7b8fc-d974-424d-9d52-ac2b2cffddb5,lab3_coordinator,research_agent,TASK_ASSIGN,delivered,,
+2026-11-12T15:36:25.403Z,af2d4862-aa26-4db4-b32d-e3147668d013,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,c40cdb33-6ab7-477e-a9db-c1f1262efe70,research_agent,lab3_coordinator,TASK_ACCEPT,delivered,,
+2026-11-12T15:36:25.404Z,af2d4862-aa26-4db4-b32d-e3147668d013,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_high_second,3622acf4-1957-4095-b9f4-a8b770156715,lab3_coordinator,coding_agent,TASK_ASSIGN,delivered,,
+2026-11-12T15:36:25.404Z,af2d4862-aa26-4db4-b32d-e3147668d013,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_high_second,2f2e6b2c-2e40-4501-a613-441acf1b00ad,coding_agent,lab3_coordinator,TASK_REJECT,delivered,,
+2026-11-12T15:36:25.404Z,af2d4862-aa26-4db4-b32d-e3147668d013,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_medium_third,fc80429e-6a4f-4b6a-a7e4-fdc6923c8297,lab3_coordinator,critic_agent,TASK_ASSIGN,delivered,,
+2026-11-12T15:36:25.404Z,af2d4862-aa26-4db4-b32d-e3147668d013,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_medium_third,f03b4fdb-ce3a-4d4b-9f20-31be33bc1004,critic_agent,lab3_coordinator,TASK_REJECT,delivered,,

@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,incident_type,actor_id,task_id,reason,blocked
+2026-11-12T15:40:11.070Z,7b28b216-1985-42c0-853b-1b614d866a3c,90920409-d357-4917-89da-c72773f46102,delegation_cycle,coding_agent,62487ae8-800b-436f-a58b-c0353b37ec33,DelegationManager found the research role in task ancestry.,True

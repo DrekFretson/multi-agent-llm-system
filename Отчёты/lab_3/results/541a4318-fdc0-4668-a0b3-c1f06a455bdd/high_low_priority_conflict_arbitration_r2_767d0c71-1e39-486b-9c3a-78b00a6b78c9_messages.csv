@@ -1,0 +1,12 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:36:25.452Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_high_second,83bae0e7-005c-4f6f-b429-5a6166e3764d,lab3_coordinator,coding_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:36:25.452Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_high_second,29bf2e7b-04e4-4b38-9e51-2a5ae138e69d,coding_agent,lab3_coordinator,NEGOTIATION_ACCEPT,delivered,,
+2026-11-12T15:36:25.452Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_medium_third,25ed5c56-7ee9-4f51-b050-7a558822ee93,lab3_coordinator,critic_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:36:25.452Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_medium_third,9d24a539-5816-4edf-a91c-02886eb7213e,lab3_coordinator,critic_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:36:25.452Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_medium_third,71bd3006-8ba8-422d-ba19-7b6f58d0d827,critic_agent,lab3_coordinator,NEGOTIATION_ACCEPT,delivered,,
+2026-11-12T15:36:25.453Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,ffb7b534-f739-4503-9f39-b350f5a97f76,lab3_coordinator,research_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:36:25.453Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,e2ee6dab-6535-43e4-a3b6-e9391f07c2ac,lab3_coordinator,research_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:36:25.453Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,990ce403-c07c-42ec-81b3-70ab01d06827,lab3_coordinator,research_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:36:25.453Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,01e2784f-b8f7-465b-96a4-c8bc80387a86,lab3_coordinator,research_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:36:25.453Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,e7d30039-6fc8-45e3-ab19-060dcba92438,research_agent,lab3_coordinator,NEGOTIATION_REJECT,delivered,,
+2026-11-12T15:36:25.453Z,767d0c71-1e39-486b-9c3a-78b00a6b78c9,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,f1bdb37c-7f44-4c52-8e37-212c52dd8856,lab3_coordinator,research_agent,ARBITRATION_DECISION,delivered,,

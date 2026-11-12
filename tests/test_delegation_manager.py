@@ -383,3 +383,27 @@ def test_duplicate_help_message_does_not_execute_twice(system):
     assert len(agents["coding_agent"].calls) == 1
     assert store.get_task(message.task_id).status is TaskStatus.RUNNING
 
+
+def test_delegation_depth_and_handoff_limits_are_configurable(system):
+    store, bus, agents, _manager = system
+    depth_limited = DelegationManager(
+        store, bus, agents=agents, max_delegation_depth=0,
+    )
+    with pytest.raises(DelegationLimitError, match="depth 1 exceeds maximum 0"):
+        _request(depth_limited)
+
+    handoff_limited = DelegationManager(
+        store, bus, agents=agents, max_handoffs=0,
+    )
+    with pytest.raises(DelegationLimitError, match="reached 0 handoffs"):
+        _request(handoff_limited)
+
+
+def test_persisted_handoff_cap_cannot_be_reset_by_new_manager(system):
+    store, bus, agents, manager = system
+    _request(manager)
+    replacement = DelegationManager(store, bus, agents=agents, max_handoffs=1)
+
+    with pytest.raises(DelegationLimitError, match="reached 1 handoffs"):
+        _request(replacement)
+

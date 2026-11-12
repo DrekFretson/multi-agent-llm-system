@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,incident_type,actor_id,task_id,reason,blocked
+2026-11-12T15:40:11.005Z,395f9ec4-8bc1-40f1-959f-29049222f554,90920409-d357-4917-89da-c72773f46102,tool_unavailable,research_agent,research-search,Search failure was caught; the task used the documented degraded path.,False

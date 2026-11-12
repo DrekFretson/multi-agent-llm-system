@@ -1,0 +1,109 @@
+{
+  "timestamp": "2026-11-12T15:36:43.847Z",
+  "finished_at": "2026-11-12T15:36:43.848Z",
+  "run_id": "3eb033e2-e414-4a77-8e1f-bded276ccc38",
+  "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+  "duration_ms": 0.465,
+  "api_calls": 0,
+  "llm_api_calls": 0,
+  "external_api_calls": 0,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "estimated_cost": null,
+  "known_prompt_tokens_subtotal": null,
+  "known_completion_tokens_subtotal": null,
+  "known_cost_subtotal": null,
+  "unknown_cost_calls": 0,
+  "incomplete_cost_calls": 0,
+  "missing_usage_calls": 0,
+  "error_count": 2,
+  "message_count": 2,
+  "incident_count": 1,
+  "task_count": 1,
+  "agent_invocations": 0,
+  "retry_count": 0,
+  "critic_calls": 0,
+  "critic_cycles": null,
+  "quality": {
+    "detected": true,
+    "blocked": true,
+    "false_blocks": 0,
+    "execution_status": "COMPLETED"
+  },
+  "llm_calls": [],
+  "external_calls": [],
+  "security_incidents": [
+    {
+      "timestamp": "2026-11-12T15:36:43.848Z",
+      "run_id": "3eb033e2-e414-4a77-8e1f-bded276ccc38",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "incident_type": "payload_contract",
+      "actor_id": "coordinator",
+      "task_id": "bad-contract",
+      "reason": "Payload field 'description' is missing or has the wrong type.",
+      "blocked": true
+    }
+  ],
+  "tasks": [
+    {
+      "timestamp": "2026-11-12T15:36:43.848Z",
+      "run_id": "3eb033e2-e414-4a77-8e1f-bded276ccc38",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "legitimate-malformed_message",
+      "agent_role": "coding",
+      "status": "COMPLETED",
+      "duration_ms": 0.0,
+      "error": null
+    }
+  ],
+  "agents": [],
+  "messages": [
+    {
+      "timestamp": "2026-11-12T15:36:43.848Z",
+      "run_id": "3eb033e2-e414-4a77-8e1f-bded276ccc38",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "bad-contract",
+      "message_id": "06f657db-1800-45e0-b0b2-80791128ce94",
+      "sender": "coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "blocked",
+      "error_type": "MessageAuthorizationError",
+      "error_message": "Message '06f657db-1800-45e0-b0b2-80791128ce94' was blocked by authorization policy."
+    },
+    {
+      "timestamp": "2026-11-12T15:36:43.848Z",
+      "run_id": "3eb033e2-e414-4a77-8e1f-bded276ccc38",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "legitimate-malformed_message",
+      "message_id": "23f6d793-5cb3-4aec-954b-1fe2eed79488",
+      "sender": "coordinator",
+      "receiver": "coding_agent",
+      "message_type": "TASK_ASSIGN",
+      "delivery_status": "delivered",
+      "error_type": null,
+      "error_message": null
+    }
+  ],
+  "errors": [
+    {
+      "timestamp": "2026-11-12T15:36:43.848Z",
+      "run_id": "3eb033e2-e414-4a77-8e1f-bded276ccc38",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "bad-contract",
+      "agent_id": "coordinator",
+      "error_type": "SecurityIncident",
+      "error_message": "Payload field 'description' is missing or has the wrong type."
+    },
+    {
+      "timestamp": "2026-11-12T15:36:43.848Z",
+      "run_id": "3eb033e2-e414-4a77-8e1f-bded276ccc38",
+      "experiment_id": "50ec1666-48e8-42c7-8e52-aa80f2f5336d",
+      "task_id": "bad-contract",
+      "agent_role": null,
+      "error_type": "MessageAuthorizationError",
+      "error_message": "Message '06f657db-1800-45e0-b0b2-80791128ce94' was blocked by authorization policy."
+    }
+  ]
+}

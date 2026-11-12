@@ -1,0 +1,11 @@
+experiment: lab_3_negotiation_conflicts
+version: 1
+seed: 30503
+repeats: 3
+dataset: ../datasets/lab_3_scenarios.json
+coordination_cost_per_message_units: 1.0
+cost_unit_definition: "One coordination message has one abstract coordination-cost unit; this is not a monetary price."
+negotiation:
+  max_rounds: 3
+  priority_rule: [priority_desc, value_desc, arrival_asc]
+  arbitration_rule: "Grant requested amount if feasible; otherwise grant minimum feasible amount in priority order."

@@ -1,0 +1,20 @@
+[
+  {
+    "scenario_id": "high_low_priority_conflict",
+    "resource_capacity": 5,
+    "claims": [
+      {"claim_id": "claim_low_first", "task_id": "task_low_first", "agent_id": "research_agent", "description": "Low-priority research claim arrives first.", "requested_units": 4, "minimum_units": 2, "priority": 1, "priority_name": "LOW", "arrival_order": 0, "can_negotiate": true, "concession_per_round": 1, "value": 0.4},
+      {"claim_id": "claim_high_second", "task_id": "task_high_second", "agent_id": "coding_agent", "description": "High-priority coding claim arrives second.", "requested_units": 4, "minimum_units": 2, "priority": 5, "priority_name": "HIGH", "arrival_order": 1, "can_negotiate": true, "concession_per_round": 1, "value": 1.0},
+      {"claim_id": "claim_medium_third", "task_id": "task_medium_third", "agent_id": "critic_agent", "description": "Medium-priority review claim.", "requested_units": 3, "minimum_units": 1, "priority": 3, "priority_name": "MEDIUM", "arrival_order": 2, "can_negotiate": true, "concession_per_round": 1, "value": 0.7}
+    ]
+  },
+  {
+    "scenario_id": "non_negotiable_scarcity",
+    "resource_capacity": 4,
+    "claims": [
+      {"claim_id": "claim_research", "task_id": "task_research", "agent_id": "research_agent", "description": "Research claim with fixed minimum.", "requested_units": 3, "minimum_units": 2, "priority": 2, "priority_name": "LOW", "arrival_order": 0, "can_negotiate": false, "concession_per_round": 1, "value": 0.5},
+      {"claim_id": "claim_coding", "task_id": "task_coding", "agent_id": "coding_agent", "description": "Coding claim with higher priority.", "requested_units": 3, "minimum_units": 2, "priority": 5, "priority_name": "HIGH", "arrival_order": 1, "can_negotiate": false, "concession_per_round": 1, "value": 1.0},
+      {"claim_id": "claim_review", "task_id": "task_review", "agent_id": "critic_agent", "description": "Review claim competes for the remaining resource.", "requested_units": 2, "minimum_units": 1, "priority": 3, "priority_name": "MEDIUM", "arrival_order": 2, "can_negotiate": true, "concession_per_round": 1, "value": 0.8}
+    ]
+  }
+]

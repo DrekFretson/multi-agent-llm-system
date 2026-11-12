@@ -1,0 +1,4 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:40:10.972Z,ed933e0b-1f84-4a86-b922-69932a27fdad,90920409-d357-4917-89da-c72773f46102,cycle-root,research,RUNNING,0.0,
+2026-11-12T15:40:10.972Z,ed933e0b-1f84-4a86-b922-69932a27fdad,90920409-d357-4917-89da-c72773f46102,f03e70d2-b47d-4c4d-a9b0-cd3700dee908,coding,WAITING,0.0,
+2026-11-12T15:40:10.972Z,ed933e0b-1f84-4a86-b922-69932a27fdad,90920409-d357-4917-89da-c72773f46102,legitimate-delegation_cycle,coding,COMPLETED,0.0,

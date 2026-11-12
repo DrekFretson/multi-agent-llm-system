@@ -270,6 +270,68 @@ def test_invalid_plan_json_is_reported(client: Mock, agent: ResearchAgent) -> No
         agent.plan_search_queries("Question")
 
 
+def test_search_plan_format_repair_is_limited_and_reports_usage(client: Mock, agent: ResearchAgent) -> None:
+    client.generate.side_effect = [
+        llm_response("not json"),
+        llm_response(json.dumps({"search_queries": ["correct query"]})),
+    ]
+
+    assert agent.plan_search_queries("Question", max_format_retries=1) == ["correct query"]
+    assert client.generate.call_count == 2
+    repair_prompt = client.generate.call_args.kwargs["messages"][1]["content"]
+    assert "Ошибка проверки" in repair_prompt
+    assert "Некорректный ответ" in repair_prompt
+
+
+def test_search_plan_repair_failure_is_bounded_and_classified(client: Mock, agent: ResearchAgent) -> None:
+    client.generate.side_effect = [llm_response("not json"), llm_response("still not json")]
+
+    with pytest.raises(ResearchPlanParseError) as error:
+        agent.plan_search_queries("Question", max_format_retries=1)
+
+    assert error.value.repair_attempts == 1
+    assert client.generate.call_count == 2
+
+
+def test_research_plan_can_request_user_input_structurally(client: Mock, search_tool: Mock, agent: ResearchAgent) -> None:
+    search_tool.enabled = True
+    client.generate.return_value = llm_response(json.dumps({
+        "search_queries": [], "needs_input": True,
+        "clarification_question": "Which country should the comparison cover?",
+    }))
+
+    report = agent.run_research("Compare regulations.")
+
+    assert report.needs_input is True
+    assert report.task_completed is False
+    assert report.clarification_question == "Which country should the comparison cover?"
+    search_tool.search_many.assert_not_called()
+
+
+def test_research_report_is_repaired_once_without_search_retry(client: Mock, search_tool: Mock, agent: ResearchAgent) -> None:
+    search_tool.enabled = True
+    search_tool.search_many.return_value = [
+        SearchResult("Source", "https://example.org", "Evidence snippet", 0.8)
+    ]
+    repaired = {
+        "summary": "A grounded summary.",
+        "key_findings": [{"claim": "The source supports this result.", "source_ids": ["S1"]}],
+        "limitations": [],
+    }
+    client.generate.side_effect = [
+        llm_response(json.dumps({"search_queries": ["query"]})),
+        llm_response("not json"),
+        llm_response(json.dumps(repaired)),
+    ]
+
+    report = agent.run_research("Question", max_format_retries=1)
+
+    assert report.summary == "A grounded summary."
+    assert report.format_repair_attempts == 1
+    assert client.generate.call_count == 3
+    assert search_tool.search_many.call_count == 1
+
+
 def test_invalid_report_json_is_reported(agent: ResearchAgent) -> None:
     with pytest.raises(ResearchReportParseError, match="not valid JSON"):
         agent._parse_report(

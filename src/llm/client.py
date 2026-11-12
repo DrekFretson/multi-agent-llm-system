@@ -6,9 +6,10 @@ import os
 import re
 import time
 import uuid
+from contextvars import ContextVar, Token
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Callable
 
 from openai import (
     APIConnectionError,
@@ -20,6 +21,21 @@ from openai import (
 )
 
 from src.logging import Logger, LoggerError
+
+
+_ACTIVE_REQUEST_HOOKS: ContextVar[tuple[Any, Any] | None] = ContextVar(
+    "llm_request_hooks", default=None
+)
+
+
+def bind_request_hooks(guard: Any, observer: Any) -> Token:
+    """Bind hooks to the current execution context, including copied worker contexts."""
+    return _ACTIVE_REQUEST_HOOKS.set((guard, observer))
+
+
+def reset_request_hooks(token: Token) -> None:
+    """Restore the request hooks active before :func:`bind_request_hooks`."""
+    _ACTIVE_REQUEST_HOOKS.reset(token)
 
 
 class LLMClientError(Exception):
@@ -105,6 +121,25 @@ class LLMClient:
             max_retries=0,
         )
         self._logger = logger if logger is not None else Logger()
+        self._request_guard: Callable[[str, list[dict[str, Any]], dict[str, Any]], Any] | None = None
+        self._response_observer: Callable[[str, LLMResponse | None, float, Exception | None, Any], None] | None = None
+
+    def set_request_hooks(
+        self,
+        *,
+        guard: Callable[[str, list[dict[str, Any]], dict[str, Any]], Any] | None = None,
+        observer: Callable[[str, LLMResponse | None, float, Exception | None, Any], None] | None = None,
+    ) -> tuple[Any, Any]:
+        """Install temporary request-budget hooks and return the previous hooks.
+
+        The guard runs immediately before a provider request. The observer runs
+        after the request succeeds or fails and receives the guard's reservation.
+        Callers should restore the returned pair after the bounded operation.
+        """
+        previous = (self._request_guard, self._response_observer)
+        self._request_guard = guard
+        self._response_observer = observer
+        return previous
 
     def close(self) -> None:
         """Close the underlying HTTP client and release its resources."""
@@ -135,8 +170,20 @@ class LLMClient:
         timestamp = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         timestamp = timestamp.replace("+00:00", "Z")
         started = time.perf_counter()
+        reservation: Any = None
+        active_hooks = _ACTIVE_REQUEST_HOOKS.get()
+        request_guard, response_observer = (
+            active_hooks if active_hooks is not None
+            else (self._request_guard, self._response_observer)
+        )
 
         try:
+            if request_guard is not None:
+                reservation = request_guard(model, messages, generation_params)
+                if isinstance(reservation, dict):
+                    adjustments = reservation.get("generation_params")
+                    if isinstance(adjustments, dict):
+                        generation_params.update(adjustments)
             raw_response = self._client.chat.completions.create(
                 model=model,
                 messages=messages,
@@ -146,6 +193,15 @@ class LLMClient:
         except Exception as error:
             duration_ms = (time.perf_counter() - started) * 1000
             converted_error = self._convert_error(error)
+            if response_observer is not None:
+                try:
+                    response_observer(model, None, duration_ms, converted_error, reservation)
+                except Exception:
+                    pass
+            self._record_run_metrics(
+                request_id=request_id, model=model, agent_id=agent_id, duration_ms=duration_ms,
+                response=None, error=converted_error,
+            )
             try:
                 self._logger.log_event(
                     "llm.request",
@@ -175,6 +231,15 @@ class LLMClient:
             raise converted_error from None
 
         duration_ms = (time.perf_counter() - started) * 1000
+        if response_observer is not None:
+            try:
+                response_observer(model, response, duration_ms, None, reservation)
+            except Exception:
+                pass
+        self._record_run_metrics(
+            request_id=request_id, model=model, agent_id=agent_id, duration_ms=duration_ms,
+            response=response, error=None,
+        )
         self._logger.log_event(
             "llm.request",
             **self._request_log_fields(
@@ -196,6 +261,36 @@ class LLMClient:
             ),
         )
         return response
+
+    def _record_run_metrics(
+        self, *, request_id: str, model: str, agent_id: str | None, duration_ms: float,
+        response: LLMResponse | None, error: Exception | None,
+    ) -> None:
+        """Send call metadata to the active run collector on a best-effort basis."""
+        try:
+            from src.evaluation.metrics import current_metric_context
+
+            context = current_metric_context()
+            if context is None:
+                return
+            context.collector.record_llm_call(
+                model_id=model,
+                agent_id=agent_id,
+                task_id=context.task_id,
+                agent_role=context.agent_role,
+                request_id=request_id,
+                duration_ms=duration_ms,
+                prompt_tokens=response.prompt_tokens if response else None,
+                completion_tokens=response.completion_tokens if response else None,
+                total_tokens=response.total_tokens if response else None,
+                finish_reason=response.finish_reason if response else None,
+                success=error is None,
+                error_type=type(error).__name__ if error is not None else None,
+                error_message=self._sanitize_error_detail(str(error)) if error is not None else None,
+            )
+        except Exception:
+            # Metrics collection must never change the outcome of an LLM request.
+            return
 
     @staticmethod
     def _normalize_response(response: Any) -> LLMResponse:
@@ -237,6 +332,17 @@ class LLMClient:
         return error
 
     def _request_log_fields(self, **fields: Any) -> dict[str, Any]:
+        try:
+            from src.evaluation.metrics import current_metric_context
+
+            context = current_metric_context()
+        except Exception:
+            context = None
+        if context is not None:
+            fields.setdefault("run_id", context.run_id)
+            fields.setdefault("experiment_id", context.experiment_id)
+            fields.setdefault("task_id", context.task_id)
+            fields.setdefault("agent_role", context.agent_role)
         fields["duration_ms"] = round(fields["duration_ms"], 3)
         return self._sanitize_log_value(fields)
 

@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,service,agent_id,agent_role,duration_ms,success,error_type,error_message
+2026-11-12T15:36:43.864Z,9b2bc54d-3f4d-46a4-a9ac-50ae2192bbbc,50ec1666-48e8-42c7-8e52-aa80f2f5336d,research-search,tavily,research_agent,research,0.054,False,SearchAPIError,The Tavily search API returned an error.

@@ -1,0 +1,3 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:36:43.759Z,fe0d79c2-18b7-4e14-a3b7-bfa67a7d3e4a,50ec1666-48e8-42c7-8e52-aa80f2f5336d,bad-contract,9631ca77-2aab-4fdc-b6a5-d8809e512c49,coordinator,coding_agent,TASK_ASSIGN,delivered,,
+2026-11-12T15:36:43.759Z,fe0d79c2-18b7-4e14-a3b7-bfa67a7d3e4a,50ec1666-48e8-42c7-8e52-aa80f2f5336d,legitimate-malformed_message,841957d1-55e0-43a4-b34d-7fce33a12883,coordinator,coding_agent,TASK_ASSIGN,delivered,,

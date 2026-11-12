@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Mapping, Sequence
 
 from src.agents.base_agent import AgentInputError, BaseAgent
@@ -35,21 +35,28 @@ logical consistency, evidence and verification. Подбирай критери�
 отсутствие источников не является ошибкой формата или основанием для REJECTED.
 
 Каждое замечание должно указывать конкретную проблему и рекомендацию. Не выдумывай
-замечания и не используй неподтверждённые предположения. Явно укажи ограничения,
+замечания и не используй неподтверждённые предположения. Если проверяется несколько
+задач, укажи target_task_id из additional_materials.dependency_tasks для каждой
+проблемы либо null, если замечание относится ко всему результату. Явно укажи ограничения,
 если материала недостаточно. APPROVED означает отсутствие критических и иных
 существенных неисправленных проблем; REJECTED требуется при существенном нарушении
 задачи, критической/major ошибке или отсутствии обязательной части. Высокий score
 не отменяет ошибку и не определяет вердикт сам по себе.
+Используй NEEDS_INPUT только если без конкретного уточнения невозможно надёжно
+проверить результат или сформулировать исправление. В таком случае укажи вопрос
+в clarification_question; не подменяй его REJECTED.
 
 Верни только JSON без Markdown, строго с полями:
 {
-  "verdict": "APPROVED или REJECTED",
+  "verdict": "APPROVED, REJECTED или NEEDS_INPUT",
   "score": 0,
   "issues": [{"category":"CORRECTNESS|LOGIC|TASK_COMPLIANCE|COMPLETENESS|SECURITY|EVIDENCE|OTHER",
     "severity":"CRITICAL|MAJOR|MINOR|INFO","description":"конкретная проблема",
-    "location":null,"recommendation":"действие для исправления"}],
+    "location":null,"recommendation":"действие для исправления",
+    "target_task_id":null}],
   "strengths": ["проверяемое достоинство"],
   "summary": "обоснованный итог",
+  "clarification_question": null,
   "criteria": {"correctness":"...","task_compliance":"...","completeness":"...",
     "logical_consistency":"...","evidence_and_verification":"..."},
   "verification_limits": ["что проверить не удалось"]
@@ -60,7 +67,7 @@ ISSUE_CATEGORIES = frozenset({
     "CORRECTNESS", "LOGIC", "TASK_COMPLIANCE", "COMPLETENESS", "SECURITY", "EVIDENCE", "OTHER"
 })
 ISSUE_SEVERITIES = frozenset({"CRITICAL", "MAJOR", "MINOR", "INFO"})
-VERDICTS = frozenset({"APPROVED", "REJECTED"})
+VERDICTS = frozenset({"APPROVED", "REJECTED", "NEEDS_INPUT"})
 CRITERIA = (
     "correctness", "task_compliance", "completeness", "logical_consistency",
     "evidence_and_verification",
@@ -88,6 +95,7 @@ class CriticIssue:
     description: str
     location: str | None
     recommendation: str
+    target_task_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -103,6 +111,8 @@ class CriticReport:
     criteria: dict[str, str] = field(default_factory=dict)
     checks: list[dict[str, str]] = field(default_factory=list)
     verification_limits: list[str] = field(default_factory=list)
+    format_repair_attempts: int = 0
+    clarification_question: str | None = None
 
 
 class CriticAgent(BaseAgent):
@@ -139,6 +149,7 @@ class CriticAgent(BaseAgent):
         agent_name: str | None = None,
         additional_materials: Mapping[str, Any] | None = None,
         required_elements: Sequence[str] = (),
+        max_format_retries: int = 1,
     ) -> CriticReport:
         """Review another agent's output against the original request.
 
@@ -153,6 +164,8 @@ class CriticAgent(BaseAgent):
             raise AgentInputError("additional_materials must be a mapping or None.")
         if not isinstance(required_elements, (list, tuple)) or any(not isinstance(v, str) for v in required_elements):
             raise AgentInputError("required_elements must be a sequence of strings.")
+        if isinstance(max_format_retries, bool) or not isinstance(max_format_retries, int) or max_format_retries < 0:
+            raise ValueError("max_format_retries must be a non-negative integer.")
 
         plain_result = CriticTool.to_plain_data(result)
         if isinstance(plain_result, dict) and isinstance(plain_result.get("content"), str):
@@ -200,8 +213,39 @@ class CriticAgent(BaseAgent):
         response = super().run("Оцени следующий результат независимым образом:\n" + request)
         if not response.success:
             raise CriticLLMError(f"Critic review call failed: {response.error}")
-        parsed = self._parse_report(response.content, resolved_type, tool_result)
-        return parsed
+        try:
+            return self._parse_report(response.content, resolved_type, tool_result)
+        except CriticReportParseError as error:
+            if max_format_retries < 1:
+                error.repair_attempts = 0
+                raise
+            try:
+                repaired = super().run(
+                    "Исправь только структуру предыдущего отчёта Critic. Ошибка проверки: "
+                    f"{error}. Не меняй выводы проверки без основания и не добавляй новых "
+                    "фактов. Верни JSON с полями verdict (APPROVED, REJECTED или NEEDS_INPUT), score "
+                    "(число 0–100), issues (список объектов category/severity/description/"
+                    "location/recommendation/target_task_id), strengths, summary, criteria с ключами "
+                    f"{list(CRITERIA)}, verification_limits и clarification_question "
+                    "(непустая строка только при NEEDS_INPUT, иначе null). Допустимые category: "
+                    f"{sorted(ISSUE_CATEGORIES)}. Допустимые severity: "
+                    f"{sorted(ISSUE_SEVERITIES)}.\nНекорректный ответ:\n{response.content}"
+                )
+            except Exception as repair_error:
+                repair_error.repair_attempts = 1
+                raise
+            if not repaired.success:
+                error = CriticLLMError(f"Could not repair critic report format: {repaired.error}")
+                error.repair_attempts = 1
+                raise error
+            try:
+                return replace(
+                    self._parse_report(repaired.content, resolved_type, tool_result),
+                    format_repair_attempts=1,
+                )
+            except CriticReportParseError as repair_error:
+                repair_error.repair_attempts = 1
+                raise
 
     def _run_checks(
         self,
@@ -332,12 +376,22 @@ class CriticAgent(BaseAgent):
                 f"Critic response is invalid JSON at line {error.lineno}, column {error.colno}."
             ) from error
         fields = {"verdict", "score", "issues", "strengths", "summary", "criteria", "verification_limits"}
-        if not isinstance(data, dict) or data.keys() != fields:
-            raise CriticReportParseError("Critic response has missing or unexpected fields.")
         verdict = data["verdict"]
         score = data["score"]
+        allowed_fields = fields | {"clarification_question"}
+        if not isinstance(data, dict) or data.keys() not in (fields, allowed_fields):
+            raise CriticReportParseError("Critic response has missing or unexpected fields.")
         if not isinstance(verdict, str) or verdict not in VERDICTS:
-            raise CriticReportParseError("verdict must be APPROVED or REJECTED.")
+            raise CriticReportParseError("verdict must be APPROVED, REJECTED, or NEEDS_INPUT.")
+        question = data.get("clarification_question")
+        if question is not None and (not isinstance(question, str) or not question.strip()):
+            raise CriticReportParseError("clarification_question must be a non-empty string or null.")
+        if verdict == "NEEDS_INPUT" and question is None:
+            question = data["summary"].strip() if isinstance(data.get("summary"), str) else None
+            if not question:
+                raise CriticReportParseError("NEEDS_INPUT requires a concrete clarification question.")
+        if verdict != "NEEDS_INPUT" and question is not None:
+            raise CriticReportParseError("clarification_question is only allowed for NEEDS_INPUT.")
         if isinstance(score, bool) or not isinstance(score, (int, float)) or not 0 <= score <= 100:
             raise CriticReportParseError("score must be a number from 0 to 100.")
         if not isinstance(data["summary"], str) or not data["summary"].strip():
@@ -360,8 +414,12 @@ class CriticAgent(BaseAgent):
         ) for finding in tool_result.findings)
         limits = list(dict.fromkeys([*data["verification_limits"], *tool_result.limitations]))
         severe_issue = any(issue.severity in {"CRITICAL", "MAJOR"} for issue in issues)
-        # Deterministic serious findings always override the language model's vote.
-        final_verdict = "REJECTED" if severe_issue else verdict
+        # Missing review evidence cannot be repaired by asking an executor to
+        # invent absent artifacts. Keep that outcome as NEEDS_INPUT so the
+        # caller can request the material instead of starting a revision cycle.
+        final_verdict = verdict
+        if verdict != "NEEDS_INPUT" and severe_issue:
+            final_verdict = "REJECTED"
         checks = [{"name": c.name, "status": c.status, "details": c.details} for c in tool_result.checks]
         if tool_result.findings:
             final_verdict = "REJECTED"
@@ -375,13 +433,17 @@ class CriticAgent(BaseAgent):
             criteria=dict(data["criteria"]),
             checks=checks,
             verification_limits=limits,
+            clarification_question=question,
         )
 
     @staticmethod
     def _parse_issue(data: Any) -> CriticIssue:
         fields = {"category", "severity", "description", "location", "recommendation"}
-        if not isinstance(data, dict) or data.keys() != fields:
-            raise CriticReportParseError("Each issue must have exactly category, severity, description, location, recommendation.")
+        if not isinstance(data, dict) or data.keys() not in (fields, fields | {"target_task_id"}):
+            raise CriticReportParseError(
+                "Each issue must have category, severity, description, location, recommendation, "
+                "and optional target_task_id."
+            )
         if (
             not isinstance(data["category"], str)
             or data["category"] not in ISSUE_CATEGORIES
@@ -393,6 +455,10 @@ class CriticAgent(BaseAgent):
             raise CriticReportParseError("Issue description must be a non-empty string.")
         if data["location"] is not None and not isinstance(data["location"], str):
             raise CriticReportParseError("Issue location must be a string or null.")
+        if data.get("target_task_id") is not None and (
+            not isinstance(data["target_task_id"], str) or not data["target_task_id"].strip()
+        ):
+            raise CriticReportParseError("Issue target_task_id must be a non-empty string or null.")
         if not isinstance(data["recommendation"], str) or not data["recommendation"].strip():
             raise CriticReportParseError("Issue recommendation must be a non-empty string.")
         return CriticIssue(**data)

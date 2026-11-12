@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,agent_role,error_type,error_message
+2026-11-12T15:36:25.447Z,c2dd70fd-050e-4414-8ac1-b77b4ce2f29c,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_high_second,,TaskExecutionError,Negotiation ended without an acceptable offer.

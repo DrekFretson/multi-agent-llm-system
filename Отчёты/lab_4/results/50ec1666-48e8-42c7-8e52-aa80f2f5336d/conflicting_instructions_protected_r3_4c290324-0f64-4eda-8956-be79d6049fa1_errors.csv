@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,agent_id,error_type,error_message
+2026-11-12T15:36:43.896Z,4c290324-0f64-4eda-8956-be79d6049fa1,50ec1666-48e8-42c7-8e52-aa80f2f5336d,instruction-task,coding_agent,SecurityIncident,A lower-precedence instruction contradicted the selected trusted instruction.

@@ -1,0 +1,4 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:40:10.835Z,8fd4d7b6-c5aa-49d1-aba5-040be7793fb4,d1953262-770e-434b-8df5-15bbd562182e,task_high_second,coding_agent,COMPLETED,0.0,
+2026-11-12T15:40:10.835Z,8fd4d7b6-c5aa-49d1-aba5-040be7793fb4,d1953262-770e-434b-8df5-15bbd562182e,task_medium_third,critic_agent,COMPLETED,0.0,
+2026-11-12T15:40:10.835Z,8fd4d7b6-c5aa-49d1-aba5-040be7793fb4,d1953262-770e-434b-8df5-15bbd562182e,task_low_first,research_agent,COMPLETED,0.0,

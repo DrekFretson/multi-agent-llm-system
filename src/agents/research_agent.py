@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import math
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from src.agents.base_agent import AgentInputError, AgentResult, BaseAgent
 from src.agents.config import AgentConfig, AgentConfigRegistry
@@ -40,13 +40,20 @@ RESEARCH_SYSTEM_PROMPT = """\
 - Если источников не передано, используй пустые source_ids; не выдумывай ссылки,
   цитаты или идентификаторы источников.
 
+Если без ответа пользователя нельзя сузить тему так, чтобы исследование имело
+однозначный смысл, укажи task_completed=false, needs_input=true и конкретный
+clarification_question. Иначе используй task_completed=true, needs_input=false и null.
+
 Верни только корректный JSON без Markdown и текста вне JSON, ровно с полями:
 {
   "summary": "краткое резюме",
   "key_findings": [
     {"claim": "вывод", "source_ids": ["S1"]}
   ],
-  "limitations": ["ограничение исследования"]
+  "limitations": ["ограничение исследования"],
+  "task_completed": true,
+  "needs_input": false,
+  "clarification_question": null
 }
 Не добавляй в ответ источники или URL; ссылки будут присоединены приложением
 по проверенным source_ids.
@@ -56,7 +63,9 @@ SEARCH_PLAN_SYSTEM_PROMPT = """\
 Ты планировщик веб-исследования. На основе задачи составь от 1 до 4 коротких,
 разноаспектных поисковых запросов. Запросы должны помогать проверить ключевые
 части вопроса и найти независимые источники. Верни только JSON вида
-{"search_queries": ["query 1", "query 2"]}. Не добавляй пояснений или Markdown.
+{"search_queries":["query 1"],"needs_input":false,"clarification_question":null}.
+Если запрос принципиально неоднозначен, верни пустой список, needs_input=true и
+конкретный вопрос. Не добавляй пояснений или Markdown.
 """
 
 
@@ -115,6 +124,10 @@ class ResearchReport:
     search_performed: bool = True
     search_status: str = "completed"
     search_unavailable_reason: str | None = None
+    format_repair_attempts: int = 0
+    task_completed: bool = True
+    needs_input: bool = False
+    clarification_question: str | None = None
 
 
 class ResearchAgent(BaseAgent):
@@ -164,39 +177,91 @@ class ResearchAgent(BaseAgent):
         if callable(getattr(self.search_tool, "set_agent_id", None)):
             self.search_tool.set_agent_id(agent_id)
 
-    def plan_search_queries(self, task: str) -> list[str]:
+    def plan_search_queries(self, task: str, *, max_format_retries: int = 1) -> list[str]:
         """Ask the configured LLM for up to four complementary web queries."""
+        return self._plan_search_queries(task, max_format_retries=max_format_retries)[0]
+
+    def _plan_search_queries(
+        self, task: str, *, max_format_retries: int
+    ) -> tuple[list[str], int, str | None]:
         if not isinstance(task, str) or not task.strip():
             raise AgentInputError("task must be a non-empty string.")
+        if isinstance(max_format_retries, bool) or not isinstance(max_format_retries, int) or max_format_retries < 0:
+            raise ValueError("max_format_retries must be a non-negative integer.")
         result = super().run(
             "Составь план поисковых запросов для следующего исследования:\n" + task,
             system_prompt=SEARCH_PLAN_SYSTEM_PROMPT,
         )
         if not result.success:
             raise ResearchLLMError(f"Could not plan research searches: {result.error}")
-        return self._parse_search_queries(result.content)
+        try:
+            queries, question = self._parse_search_plan(result.content)
+            return queries, 0, question
+        except ResearchPlanParseError as error:
+            if max_format_retries < 1:
+                error.repair_attempts = 0
+                raise
+            try:
+                repaired = super().run(
+                    "Исправь только формат предыдущего плана поиска. Ошибка проверки: "
+                    f"{error}. Ожидается JSON с 1–4 непустыми search_queries, "
+                    "needs_input=false и clarification_question=null; либо пустой список, "
+                    "needs_input=true и конкретный вопрос, если уточнение обязательно. "
+                    "Сохрани смысл исходного запроса.\n"
+                    f"Некорректный ответ:\n{result.content}",
+                    system_prompt=SEARCH_PLAN_SYSTEM_PROMPT,
+                )
+            except Exception as repair_error:
+                repair_error.repair_attempts = 1
+                raise
+            if not repaired.success:
+                error = ResearchLLMError(f"Could not repair search plan format: {repaired.error}")
+                error.repair_attempts = 1
+                raise error
+            try:
+                queries, question = self._parse_search_plan(repaired.content)
+                return queries, 1, question
+            except ResearchPlanParseError as repair_error:
+                repair_error.repair_attempts = 1
+                raise
 
-    def run_research(self, task: str) -> ResearchReport:
+    def run_research(self, task: str, *, max_format_retries: int = 1) -> ResearchReport:
         """Run planning, bounded search, and evidence-grounded synthesis."""
         if not isinstance(task, str) or not task.strip():
             raise AgentInputError("task must be a non-empty string.")
         topic = task.strip()
+        if isinstance(max_format_retries, bool) or not isinstance(max_format_retries, int) or max_format_retries < 0:
+            raise ValueError("max_format_retries must be a non-negative integer.")
         if not self.search_tool.enabled:
             reason = self._humanize_search_reason(
                 self.search_tool.disabled_reason or "search_disabled"
             )
             status = self.search_tool.last_search_status or "disabled"
-            return self._synthesize_without_search(topic, [], status=status, reason=reason)
+            return self._synthesize_without_search(
+                topic, [], status=status, reason=reason, max_format_retries=max_format_retries
+            )
 
-        queries = self.plan_search_queries(topic)
+        queries, format_repairs, clarification_question = self._plan_search_queries(
+            topic, max_format_retries=max_format_retries
+        )
+        if clarification_question:
+            return ResearchReport(
+                topic=topic,
+                summary="Для исследования требуется уточнение пользователя.",
+                key_findings=[], sources=[], limitations=[], search_queries=[],
+                search_performed=False, search_status="needs_input",
+                format_repair_attempts=format_repairs,
+                task_completed=False, needs_input=True,
+                clarification_question=clarification_question,
+            )
         if not queries:
-            return self._empty_report(
+            return replace(self._empty_report(
                 topic,
                 queries,
                 search_performed=False,
                 search_status="no_queries",
                 reason="No valid search queries were generated.",
-            )
+            ), format_repair_attempts=format_repairs)
 
         try:
             search_results = self.search_tool.search_many(
@@ -215,7 +280,9 @@ class ResearchAgent(BaseAgent):
             else:
                 reason = self._humanize_search_reason(reason)
             return self._synthesize_without_search(
-                topic, queries, status=status, reason=reason
+                topic, queries, status=status, reason=reason,
+                max_format_retries=max(0, max_format_retries - format_repairs),
+                prior_repairs=format_repairs,
             )
 
         try:
@@ -231,10 +298,13 @@ class ResearchAgent(BaseAgent):
                 queries,
                 status="invalid_response",
                 reason="The search provider returned data that could not be safely validated.",
+                max_format_retries=max(0, max_format_retries - format_repairs),
+                prior_repairs=format_repairs,
             )
         if not unique_results:
-            return self._empty_report(topic, queries, search_performed=True,
-                                      search_status="no_results")
+            return replace(self._empty_report(topic, queries, search_performed=True,
+                                      search_status="no_results"),
+                           format_repair_attempts=format_repairs)
 
         source_ids = {
             f"S{index}": result for index, result in enumerate(unique_results, start=1)
@@ -260,14 +330,16 @@ class ResearchAgent(BaseAgent):
         if not result.success:
             raise ResearchLLMError(f"Could not synthesize the research report: {result.error}")
 
-        return self._parse_report(
+        report, report_repairs = self._parse_report_with_repair(
             result.content,
             topic=topic,
             queries=queries,
             source_results=source_ids,
             search_performed=True,
             search_status="completed",
+            max_format_retries=max(0, max_format_retries - format_repairs),
         )
+        return replace(report, format_repair_attempts=format_repairs + report_repairs)
 
     def _synthesize_without_search(
         self,
@@ -276,6 +348,8 @@ class ResearchAgent(BaseAgent):
         *,
         status: str,
         reason: str,
+        max_format_retries: int = 1,
+        prior_repairs: int = 0,
     ) -> ResearchReport:
         """Produce a clearly unverified report without inventing evidence."""
         self._log_search_event(
@@ -297,7 +371,7 @@ class ResearchAgent(BaseAgent):
         result = super().run(request, system_prompt=self.system_prompt)
         if not result.success:
             raise ResearchLLMError(f"Could not synthesize the research report: {result.error}")
-        report = self._parse_report(
+        report, report_repairs = self._parse_report_with_repair(
             result.content,
             topic=topic,
             queries=queries,
@@ -305,20 +379,67 @@ class ResearchAgent(BaseAgent):
             search_performed=False,
             search_status=status,
             search_unavailable_reason=reason,
+            max_format_retries=max_format_retries,
         )
         if reason not in report.limitations:
-            report = ResearchReport(
-                topic=report.topic,
-                summary=report.summary,
-                key_findings=report.key_findings,
-                sources=report.sources,
-                limitations=[*report.limitations, reason],
-                search_queries=report.search_queries,
-                search_performed=False,
-                search_status=status,
-                search_unavailable_reason=reason,
+            report = replace(report, limitations=[*report.limitations, reason])
+        return replace(report, format_repair_attempts=prior_repairs + report_repairs)
+
+    def _parse_report_with_repair(
+        self,
+        content: str,
+        *,
+        topic: str,
+        queries: list[str],
+        source_results: dict[str, SearchResult],
+        search_performed: bool,
+        search_status: str,
+        max_format_retries: int,
+        search_unavailable_reason: str | None = None,
+    ) -> tuple[ResearchReport, int]:
+        def parse(value: str) -> ResearchReport:
+            return self._parse_report(
+                value,
+                topic=topic,
+                queries=queries,
+                source_results=source_results,
+                search_performed=search_performed,
+                search_status=search_status,
+                search_unavailable_reason=search_unavailable_reason,
             )
-        return report
+
+        try:
+            return parse(content), 0
+        except (ResearchReportParseError, ResearchReportValidationError) as error:
+            unsafe_content_error = any(marker in str(error).casefold() for marker in (
+                "unknown source", "must cite source ids", "must not introduce urls", "invalid claim",
+            ))
+            if max_format_retries < 1 or unsafe_content_error:
+                error.repair_attempts = 0
+                raise
+            try:
+                repaired = super().run(
+                    "Исправь только формат и обязательные поля отчёта. Ошибка валидации: "
+                    f"{error}. Не меняй смысл и не добавляй факты. Ожидаемый JSON: "
+                    "{\"summary\":string,\"key_findings\":[{\"claim\":string,"
+                    "\"source_ids\":[string]}],\"limitations\":[string],"
+                    "\"task_completed\":bool,\"needs_input\":bool,"
+                    "\"clarification_question\":string|null}. Используй только "
+                    "переданные source_ids.\nНекорректный ответ:\n" + content,
+                    system_prompt=self.system_prompt,
+                )
+            except Exception as repair_error:
+                repair_error.repair_attempts = 1
+                raise
+            if not repaired.success:
+                error = ResearchLLMError(f"Could not repair research report format: {repaired.error}")
+                error.repair_attempts = 1
+                raise error
+            try:
+                return parse(repaired.content), 1
+            except (ResearchReportParseError, ResearchReportValidationError) as repair_error:
+                repair_error.repair_attempts = 1
+                raise
 
     def _log_search_event(self, event_type: str, **fields: object) -> None:
         log_event = getattr(self.search_tool, "log_event", None)
@@ -393,6 +514,8 @@ class ResearchAgent(BaseAgent):
             not isinstance(query, str) or not query.strip() for query in raw_queries
         ):
             raise ResearchPlanParseError("'search_queries' must be a list of non-empty strings.")
+        if not raw_queries:
+            raise ResearchPlanParseError("'search_queries' must contain at least one query unless needs_input is true.")
 
         queries: list[str] = []
         seen: set[str] = set()
@@ -405,6 +528,28 @@ class ResearchAgent(BaseAgent):
             if len(queries) >= cls.MAX_QUERIES:
                 break
         return queries
+
+    @classmethod
+    def _parse_search_plan(cls, content: str) -> tuple[list[str], str | None]:
+        try:
+            payload = json.loads(content)
+        except json.JSONDecodeError:
+            return cls._parse_search_queries(content), None
+        if isinstance(payload, dict) and "needs_input" in payload:
+            fields = {"search_queries", "needs_input", "clarification_question"}
+            if payload.keys() != fields or not isinstance(payload["needs_input"], bool):
+                raise ResearchPlanParseError("Search plan status fields have an invalid structure.")
+            question = payload["clarification_question"]
+            if payload["needs_input"]:
+                if payload["search_queries"] != [] or not isinstance(question, str) or not question.strip():
+                    raise ResearchPlanParseError(
+                        "A needs_input search plan needs an empty query list and a concrete question."
+                    )
+                return [], question.strip()
+            if question is not None:
+                raise ResearchPlanParseError("clarification_question must be null when needs_input is false.")
+            return cls._parse_search_queries(json.dumps({"search_queries": payload["search_queries"]})), None
+        return cls._parse_search_queries(content), None
 
     @classmethod
     def _validated_unique_results(cls, results: Any) -> list[SearchResult]:
@@ -486,10 +631,11 @@ class ResearchAgent(BaseAgent):
                 f"column {error.colno}."
             ) from error
         required = {"summary", "key_findings", "limitations"}
+        status_fields = {"task_completed", "needs_input", "clarification_question"}
         if not isinstance(payload, dict):
             raise ResearchReportValidationError("Research report JSON must be an object.")
         missing = required - payload.keys()
-        extra = payload.keys() - required
+        extra = payload.keys() - required - status_fields
         if missing:
             raise ResearchReportValidationError(
                 f"Research report is missing field(s): {', '.join(sorted(missing))}."
@@ -497,6 +643,21 @@ class ResearchAgent(BaseAgent):
         if extra:
             raise ResearchReportValidationError(
                 f"Research report has unexpected field(s): {', '.join(sorted(extra))}."
+            )
+        task_completed = payload.get("task_completed", True)
+        needs_input = payload.get("needs_input", False)
+        clarification_question = payload.get("clarification_question")
+        if not isinstance(task_completed, bool) or not isinstance(needs_input, bool):
+            raise ResearchReportValidationError("Research report completion fields must be booleans.")
+        if clarification_question is not None and not isinstance(clarification_question, str):
+            raise ResearchReportValidationError("clarification_question must be a string or null.")
+        if needs_input and (task_completed or not (clarification_question or "").strip()):
+            raise ResearchReportValidationError(
+                "A needs_input report must be incomplete and include a clarification question."
+            )
+        if not needs_input and clarification_question is not None:
+            raise ResearchReportValidationError(
+                "clarification_question must be null unless needs_input is true."
             )
         if not isinstance(payload["summary"], str) or not payload["summary"].strip():
             raise ResearchReportValidationError("Research report 'summary' must be a non-empty string.")
@@ -566,6 +727,9 @@ class ResearchAgent(BaseAgent):
             search_performed=search_performed,
             search_status=search_status,
             search_unavailable_reason=search_unavailable_reason,
+            task_completed=task_completed,
+            needs_input=needs_input,
+            clarification_question=clarification_question,
         )
 
     @staticmethod

@@ -47,6 +47,7 @@ _GENERATION_PARAMETERS = frozenset(
         "prompt_cache_key",
         "prompt_cache_options",
         "prompt_cache_retention",
+        "reasoning",
         "reasoning_effort",
         "response_format",
         "safety_identifier",
@@ -339,6 +340,43 @@ class AgentConfigRegistry:
                 ):
                     raise AgentConfigError(
                         f"Agent {name!r}: 'metadata' must map strings to strings."
+                    )
+            elif key == "reasoning":
+                if not isinstance(value, dict):
+                    raise AgentConfigError(
+                        f"Agent {name!r}: 'reasoning' must be a mapping."
+                    )
+                allowed_reasoning_fields = {"effort", "max_tokens", "enabled", "exclude"}
+                unknown_reasoning_fields = value.keys() - allowed_reasoning_fields
+                if unknown_reasoning_fields:
+                    raise AgentConfigError(
+                        f"Agent {name!r}: unsupported reasoning option(s): "
+                        f"{', '.join(sorted(map(str, unknown_reasoning_fields)))}."
+                    )
+                if "effort" in value and not isinstance(value["effort"], str):
+                    raise AgentConfigError(
+                        f"Agent {name!r}: 'reasoning.effort' must be a string."
+                    )
+                if "max_tokens" in value and (
+                    isinstance(value["max_tokens"], bool)
+                    or not isinstance(value["max_tokens"], int)
+                    or value["max_tokens"] <= 0
+                ):
+                    raise AgentConfigError(
+                        f"Agent {name!r}: 'reasoning.max_tokens' must be a positive integer."
+                    )
+                if "effort" in value and "max_tokens" in value:
+                    raise AgentConfigError(
+                        f"Agent {name!r}: set either 'reasoning.effort' or "
+                        "'reasoning.max_tokens', not both."
+                    )
+                if any(
+                    field in value and not isinstance(value[field], bool)
+                    for field in ("enabled", "exclude")
+                ):
+                    raise AgentConfigError(
+                        f"Agent {name!r}: 'reasoning.enabled' and 'reasoning.exclude' "
+                        "must be booleans."
                     )
             elif key in {
                 "audio",

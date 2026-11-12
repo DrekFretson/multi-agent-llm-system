@@ -1,0 +1,4 @@
+timestamp,run_id,experiment_id,task_id,agent_role,status,duration_ms,error
+2026-11-12T15:36:25.492Z,8f020474-3c64-4137-ae7f-24c950881102,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_high_second,coding_agent,COMPLETED,0.0,
+2026-11-12T15:36:25.492Z,8f020474-3c64-4137-ae7f-24c950881102,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_medium_third,critic_agent,COMPLETED,0.0,
+2026-11-12T15:36:25.492Z,8f020474-3c64-4137-ae7f-24c950881102,541a4318-fdc0-4668-a0b3-c1f06a455bdd,task_low_first,,SKIPPED,0.0,Arbitrator applied configured priority/value/arrival rule after negotiation.

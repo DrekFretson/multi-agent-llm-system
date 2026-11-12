@@ -1,0 +1,30 @@
+name: role_model_comparison
+dataset: ../datasets/benchmark_tasks.json
+models:
+  research: [reasoning, coding]
+  coding: [coding, reasoning]
+  math: [reasoning, coding]
+  critic: [reasoning, coding]
+generation_params:
+  research:
+    temperature: 0.1
+    max_tokens: 3000
+  coding:
+    temperature: 0.05
+    max_tokens: 5000
+  math:
+    temperature: 0.05
+    max_tokens: 4000
+  critic:
+    temperature: 0.025
+    max_tokens: 3500
+repeats: 3
+seed: 2026
+limits:
+  max_execution_time: 300
+  max_calls: 20
+  max_tokens: 20000
+  max_total_retries: 2
+critic:
+  enabled: true
+  max_cycles: 1

@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,incident_type,actor_id,task_id,reason,blocked
+2026-11-12T15:40:11.038Z,8bca673b-b4b0-489f-92a7-ec5de056500a,90920409-d357-4917-89da-c72773f46102,payload_contract,coordinator,bad-contract,Payload field 'description' is missing or has the wrong type.,True

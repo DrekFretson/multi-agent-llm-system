@@ -1,0 +1,37 @@
+[
+  {
+    "scenario_id": "mixed_capabilities",
+    "agents": [
+      {"agent_id": "research_fast", "capabilities": ["research", "summarize"], "capacity_units": 8, "throughput": 2.0, "cost_per_unit": 1.4, "competence": {"research": 0.91, "summarize": 0.88}},
+      {"agent_id": "research_economy", "capabilities": ["research"], "capacity_units": 6, "throughput": 1.4, "cost_per_unit": 0.7, "competence": {"research": 0.84}},
+      {"agent_id": "coder_general", "capabilities": ["coding", "testing"], "capacity_units": 8, "throughput": 1.8, "cost_per_unit": 1.0, "competence": {"coding": 0.90, "testing": 0.86}},
+      {"agent_id": "coder_specialist", "capabilities": ["coding"], "capacity_units": 5, "throughput": 1.2, "cost_per_unit": 0.8, "competence": {"coding": 0.96}},
+      {"agent_id": "critic", "capabilities": ["review", "summarize"], "capacity_units": 5, "throughput": 1.0, "cost_per_unit": 0.9, "competence": {"review": 0.93, "summarize": 0.80}},
+      {"agent_id": "offline_research", "capabilities": ["research"], "capacity_units": 10, "throughput": 3.0, "cost_per_unit": 0.2, "competence": {"research": 0.99}, "available": false}
+    ],
+    "tasks": [
+      {"task_id": "mixed_research_1", "description": "Collect and synthesize three local reference notes.", "task_type": "RESEARCH", "capability": "research", "work_units": 3, "priority": "HIGH"},
+      {"task_id": "mixed_code_1", "description": "Implement a small parser module.", "task_type": "CODING", "capability": "coding", "work_units": 3, "priority": "HIGH"},
+      {"task_id": "mixed_test_1", "description": "Design tests for the parser module.", "task_type": "CODING", "capability": "testing", "work_units": 2, "priority": "MEDIUM"},
+      {"task_id": "mixed_review_1", "description": "Review a local design note.", "task_type": "REVIEW", "capability": "review", "work_units": 2, "priority": "MEDIUM"},
+      {"task_id": "mixed_research_2", "description": "Research a capability with a synthetic preferred-agent failure.", "task_type": "RESEARCH", "capability": "research", "work_units": 2, "priority": "LOW", "fail_for_agents": ["research_fast"]},
+      {"task_id": "mixed_unavailable", "description": "Request a capability from unavailable profiles only.", "task_type": "RESEARCH", "capability": "translation", "work_units": 1, "priority": "LOW"}
+    ]
+  },
+  {
+    "scenario_id": "capacity_pressure",
+    "agents": [
+      {"agent_id": "research_fast", "capabilities": ["research", "summarize"], "capacity_units": 5, "throughput": 2.0, "cost_per_unit": 1.4, "competence": {"research": 0.91, "summarize": 0.88}},
+      {"agent_id": "research_economy", "capabilities": ["research"], "capacity_units": 4, "throughput": 1.4, "cost_per_unit": 0.7, "competence": {"research": 0.84}},
+      {"agent_id": "coder_general", "capabilities": ["coding", "testing"], "capacity_units": 5, "throughput": 1.8, "cost_per_unit": 1.0, "competence": {"coding": 0.90, "testing": 0.86}},
+      {"agent_id": "coder_specialist", "capabilities": ["coding"], "capacity_units": 4, "throughput": 1.2, "cost_per_unit": 0.8, "competence": {"coding": 0.96}},
+      {"agent_id": "critic", "capabilities": ["review", "summarize"], "capacity_units": 3, "throughput": 1.0, "cost_per_unit": 0.9, "competence": {"review": 0.93, "summarize": 0.80}}
+    ],
+    "tasks": [
+      {"task_id": "pressure_code_1", "description": "Implement a feature under limited capacity.", "task_type": "CODING", "capability": "coding", "work_units": 3, "priority": "HIGH"},
+      {"task_id": "pressure_code_2", "description": "Implement a second feature under limited capacity.", "task_type": "CODING", "capability": "coding", "work_units": 3, "priority": "MEDIUM"},
+      {"task_id": "pressure_research_1", "description": "Summarize a small local corpus.", "task_type": "RESEARCH", "capability": "summarize", "work_units": 2, "priority": "MEDIUM"},
+      {"task_id": "pressure_review_1", "description": "Review a test plan.", "task_type": "REVIEW", "capability": "review", "work_units": 2, "priority": "LOW"}
+    ]
+  }
+]

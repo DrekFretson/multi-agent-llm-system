@@ -1,0 +1,6 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:36:43.809Z,0216850b-1717-4000-bb04-b9822b661d44,50ec1666-48e8-42c7-8e52-aa80f2f5336d,cycle-0,d0b899bc-67b0-4719-85f6-18c24bed0160,research_agent,coding_agent,HELP_REQUEST,delivered,,
+2026-11-12T15:36:43.809Z,0216850b-1717-4000-bb04-b9822b661d44,50ec1666-48e8-42c7-8e52-aa80f2f5336d,cycle-1,8ab50c56-5083-4eaf-b9c3-907d41042989,coding_agent,research_agent,HELP_REQUEST,delivered,,
+2026-11-12T15:36:43.809Z,0216850b-1717-4000-bb04-b9822b661d44,50ec1666-48e8-42c7-8e52-aa80f2f5336d,cycle-2,cc31e507-d2e2-42fe-8e80-ac5658544b6a,research_agent,coding_agent,HELP_REQUEST,delivered,,
+2026-11-12T15:36:43.809Z,0216850b-1717-4000-bb04-b9822b661d44,50ec1666-48e8-42c7-8e52-aa80f2f5336d,cycle-3,138fb1b7-e17b-447d-8d2d-f26bc6593b5f,coding_agent,research_agent,HELP_REQUEST,delivered,,
+2026-11-12T15:36:43.809Z,0216850b-1717-4000-bb04-b9822b661d44,50ec1666-48e8-42c7-8e52-aa80f2f5336d,legitimate-delegation_cycle,92a32c20-546c-4fbf-9132-3a5d43c6c6e7,coordinator,coding_agent,TASK_ASSIGN,delivered,,

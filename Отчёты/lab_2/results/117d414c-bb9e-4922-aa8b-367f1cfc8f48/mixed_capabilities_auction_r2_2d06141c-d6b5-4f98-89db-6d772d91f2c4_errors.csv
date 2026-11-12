@@ -1,0 +1,2 @@
+timestamp,run_id,experiment_id,task_id,agent_role,error_type,error_message
+2026-11-12T15:36:21.106Z,2d06141c-d6b5-4f98-89db-6d772d91f2c4,117d414c-bb9e-4922-aa8b-367f1cfc8f48,mixed_unavailable,,TaskExecutionError,Auction received no eligible bids.

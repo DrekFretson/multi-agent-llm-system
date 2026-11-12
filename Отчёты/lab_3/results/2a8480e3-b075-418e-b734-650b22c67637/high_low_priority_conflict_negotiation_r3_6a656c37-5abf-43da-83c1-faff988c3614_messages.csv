@@ -1,0 +1,11 @@
+timestamp,run_id,experiment_id,task_id,message_id,sender,receiver,message_type,delivery_status,error_type,error_message
+2026-11-12T15:37:38.293Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_low_first,e2448dbc-b62c-4fdf-ab4b-85501e2a0245,lab3_coordinator,research_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:38.293Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_low_first,b064a810-92e1-4f74-8ba1-b98f3460f263,research_agent,lab3_coordinator,NEGOTIATION_ACCEPT,delivered,,
+2026-11-12T15:37:38.293Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_high_second,8943b044-2bce-4ab3-bc26-2d755f3f7e54,lab3_coordinator,coding_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:38.293Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_high_second,b7b917c8-5e04-4f5b-a5bf-a5be8fbb66b9,lab3_coordinator,coding_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:37:38.294Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_high_second,33e3dcdd-edbd-4a5a-8fcc-80f42893f207,lab3_coordinator,coding_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:37:38.294Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_high_second,b332becb-f349-446c-9044-2e1a26ef84c2,lab3_coordinator,coding_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:37:38.294Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_high_second,3b352715-1530-4e62-9549-74d0a08df5c4,coding_agent,lab3_coordinator,NEGOTIATION_REJECT,delivered,,
+2026-11-12T15:37:38.294Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_medium_third,819433cc-0a26-4883-9a78-5fa75d7ed9ce,lab3_coordinator,critic_agent,NEGOTIATION_PROPOSAL,delivered,,
+2026-11-12T15:37:38.294Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_medium_third,b1b73193-f41f-4482-a348-fbc609b6018b,lab3_coordinator,critic_agent,NEGOTIATION_COUNTER,delivered,,
+2026-11-12T15:37:38.294Z,6a656c37-5abf-43da-83c1-faff988c3614,2a8480e3-b075-418e-b734-650b22c67637,task_medium_third,593f087a-1bd5-4195-93e2-b9919d778183,critic_agent,lab3_coordinator,NEGOTIATION_ACCEPT,delivered,,

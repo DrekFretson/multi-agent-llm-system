@@ -1,0 +1,2 @@
+timestamp,finished_at,run_id,experiment_id,duration_ms,api_calls,llm_api_calls,external_api_calls,prompt_tokens,completion_tokens,total_tokens,estimated_cost,known_prompt_tokens_subtotal,known_completion_tokens_subtotal,known_cost_subtotal,unknown_cost_calls,incomplete_cost_calls,missing_usage_calls,error_count,message_count,incident_count,task_count,agent_invocations,retry_count,critic_calls,critic_cycles
+2026-11-12T15:37:38.281Z,2026-11-12T15:37:38.283Z,6be86cbd-c5c4-40eb-989d-728362ee0786,2a8480e3-b075-418e-b734-650b22c67637,1.982,0,0,0,,,,,,,,0,0,0,1,10,0,3,0,0,0,
