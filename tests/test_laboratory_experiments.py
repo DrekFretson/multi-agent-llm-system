@@ -77,7 +77,9 @@ def test_lab4_concurrent_runs_do_not_mix_run_ids_or_files(tmp_path: Path) -> Non
     for run, result_dir in zip(runs, result_dirs):
         assert all(row["run_id"] != run["experiment_id"] for row in run["records"])
         assert len(list(result_dir.glob("*.json"))) >= len(run["records"])
-        for path in result_dir.glob("*_malformed_message_protected_*.json"):
+        records = sorted(result_dir.glob("malformed_message_protected_r*.json"))
+        assert len(records) == 3
+        for path in records:
             record = json.loads(path.read_text(encoding="utf-8"))
             assert record["experiment_id"] == run["experiment_id"]
 

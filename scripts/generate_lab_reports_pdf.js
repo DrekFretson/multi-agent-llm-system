@@ -118,10 +118,10 @@ function makePdf(number, subtitle, topic) {
   function drawTable(rows) {
     table++;
     ensure(30);
-    drawParagraph(`Таблица ${table} — результаты сравнения`, { bold: true, size: 9.5, after: 8, align: 'left' });
+    drawParagraph(`Таблица ${table} - результаты сравнения`, { bold: true, size: 9.5, after: 8, align: 'left' });
     const headers = rows[0];
     for (const [index, row] of rows.slice(1).entries()) {
-      const label = row.slice(0, headers.length === 3 ? 1 : 2).join(' — ');
+      const label = row.slice(0, headers.length === 3 ? 1 : 2).join(' - ');
       const offset = headers.length === 3 ? 1 : 2;
       const details = row.slice(offset).map((v, j) => `${headers[j + offset]}: ${v}`).join('; ');
       doc.font('Bold').fontSize(9.4);
@@ -173,7 +173,7 @@ function makePdf(number, subtitle, topic) {
     doc.switchToPage(index);
     doc.moveTo(LEFT, 795).lineTo(WIDTH - RIGHT, 795).lineWidth(0.35).strokeColor(line).stroke();
     doc.fillColor(gray).font('Regular').fontSize(8)
-      .text(`Лабораторная работа № ${number} — Adaptive Multi-Agent LLM System`, LEFT, 806,
+      .text(`Лабораторная работа № ${number} - Adaptive Multi-Agent LLM System`, LEFT, 806,
         { width: BODY_WIDTH - 30 });
     doc.text(String(index + 1), WIDTH - RIGHT - 25, 806, { width: 25, align: 'right' });
   }
@@ -183,9 +183,9 @@ function makePdf(number, subtitle, topic) {
 
 (async () => {
   const jobs = [
-    [2, 'Распределение задач между агентами', 'Adaptive Multi-Agent LLM System — сравнение механизмов назначения задач'],
-    [3, 'Переговоры и разрешение конфликтов', 'Adaptive Multi-Agent LLM System — распределение ограниченного ресурса'],
-    [4, 'Надёжность и безопасность многоагентной системы', 'Adaptive Multi-Agent LLM System — проверка защитных механизмов'],
+    [2, 'Распределение задач между агентами', 'Adaptive Multi-Agent LLM System - сравнение механизмов назначения задач'],
+    [3, 'Переговоры и разрешение конфликтов', 'Adaptive Multi-Agent LLM System - распределение ограниченного ресурса'],
+    [4, 'Надёжность и безопасность многоагентной системы', 'Adaptive Multi-Agent LLM System - проверка защитных механизмов'],
   ];
   for (const job of jobs) console.log(await makePdf(...job));
 })().catch(error => { console.error(error); process.exitCode = 1; });
